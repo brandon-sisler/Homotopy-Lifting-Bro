@@ -5,4 +5,11 @@ variable {X : Type _} [TopologicalSpace X] {x₀ x₁ : X }
 -- def baseSet : TopologicalSpace X 
 
 def Cover :=
-  ⋃ x₁ ∈ X , {γ | γ ∈ Path.Homotopic.Quotient x₀ x₁}
+  Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
+
+
+
+#exit
+
+
+Sigma 
