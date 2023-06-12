@@ -47,21 +47,18 @@ lemma is_open_inter_of_coe_preim {X : Type α} [TopologicalSpace X] (s t : Set X
 lemma is_open_of_is_open_coe (Y:Type α) [TopologicalSpace Y] (A: Set Y)
 --(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((coe : U → Y) ⁻¹' A)) : IsOpen A := by sorry
 
-lemma is_closed_of_is_closed_coe (Y:Type*) [topological_space Y] (A: set Y)
-(hA : ∀ x : Y, ∃ (U : set Y) (hU : U ∈ 𝓝 x), is_closed ((coe : U → Y) ⁻¹' A)) : is_closed A :=
- ⟨ is_open_of_is_open_coe Y Aᶜ (λ x, let ⟨U, hU,hN⟩ := hA x in ⟨ U,  hU , hN.1 ⟩) ⟩
+lemma is_closed_of_is_closed_coe (Y:Type α) [TopologicalSpace Y] (A: Set Y)
+--(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClosed ((coe : U → Y) ⁻¹' A)) : IsClosed A := by sorry
 
-lemma is_clopen_of_is_clopen_coe (Y:Type*) [topological_space Y] (A: set Y)
-(hA : ∀ x : Y, ∃ (U : set Y) (hU : U ∈ 𝓝 x), is_clopen ((coe : U → Y) ⁻¹' A)) : is_clopen A :=
-⟨is_open_of_is_open_coe  Y A (λ x, let  ⟨ z,hz,hhz⟩:= hA x in ⟨ z,hz,hhz.1⟩  ) ,
- is_closed_of_is_closed_coe  Y A (λ x, let  ⟨ z,hz,hhz⟩:= hA x in ⟨ z,hz,hhz.2⟩  )⟩
+lemma is_clopen_of_is_clopen_coe (Y:Type α) [TopologicalSpace Y] (A: Set Y)
+--(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), is_clopen ((coe : U → Y) ⁻¹' A)) : IsClopen A : =by sorry 
 
-theorem clopen_equalizer_of_discrete {X Y : Type*} [topological_space X] [topological_space Y]
-  [discrete_topology Y] {f g : X → Y} (hf : continuous f) (hg : continuous g) :
-  is_clopen {x : X | f x = g x} := (is_clopen_discrete (set.diagonal Y)).preimage (hf.prod_mk hg)
+theorem clopen_equalizer_of_discrete {X Y : Type α} [TopologicalSpace X] [TopologicalSpace Y]
+  [DiscreteTopology Y] {f g : X → Y} (hf : Continuous f) (hg : Continuous g) :
+  --IsClopen {x : X | f x = g x} := (is_clopen_discrete (set.diagonal Y)).preimage (hf.prod_mk hg)
 
 
-lemma tautology : true := sorry
+lemma tautology : true := rfl
 
 theorem uniqueness_of_homotopy_lifting (Y : Type α) [TopologicalSpace Y] (hf : IsCoveringMap f)
   (H₁ H₂ : ContinuousMap Y E) (h : f ∘ H₁ = f ∘ H₂)
