@@ -37,10 +37,14 @@ Theorems:
 -/
 
 variable {X Y E : Type _}
-variable [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace Z]
+variable [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace E]
 variable (x : X) (y : Y) (t : I)
 
-
+lemma nbhd_in_trivialization (y : Y) (t : I) (Continuous f : Y × I → X) (IsCoveringMap p : E → X) :
+  ∃ Nyt ∈ 𝓝 (y, t), ∃ U : Set X, ∃ t : Trivialization (p ⁻¹' U) p,
+  f '' Nyt ⊆ t.baseSet := by
+    
+    sorry
 
 theorem homotopy_lift (Continuous f : Y × I → X) (IsCoveringMap p : E → X) (Continuous F₀ : Y → E) :
   ∃ Continuous F : Y × I → E, p ∘ F = f ∧ (fun y ↦ F ⟨y, 0⟩) = F₀ := by
