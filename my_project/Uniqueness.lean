@@ -63,6 +63,8 @@ theorem Uniqueness_Of_Homotopy_Lifting (Y X E: Type _)
 (hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) : H₁ = H₂  := by sorry
 
 
+--f
+
 /- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
 
 
