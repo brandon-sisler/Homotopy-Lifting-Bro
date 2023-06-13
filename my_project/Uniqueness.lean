@@ -5,12 +5,10 @@ import Mathlib.Topology.IsLocallyHomeomorph
 import Mathlib.Topology.LocallyConstant.basic
 import Mathlib.SetTheory.cardinal.basic
 import Mathlib.Topology.Covering
+--import Mathlib.Topology.basic
 
 
 open Set Filter Topology
-
-
-variable (f)
 
 
 
@@ -39,6 +37,9 @@ variable (f)
 /- Lemma 1 stating that a set S ⊆ Y is clopen in Y ↔ ∀ y ∈ Y ∃ nbhd U_y of y 
 such that U_y ∩ S is clopen in U_y -/
 
+lemma ClopenIffNbhdClopen (Y: Type _) [TopologicalSpace Y](S : Set Y) :
+ ∀ y :  Y, ∃ U: Set Y,  U ∈ 𝓝 y  ↔ IsClopen S := by sorry
+
 
 
 /- Lemma 1 proof -/
@@ -48,7 +49,10 @@ such that U_y ∩ S is clopen in U_y -/
 /- Lemma 2 stating that if f, g : X → Y are continuous and Y is a discrete topological
 space, then {x ∈ X ∣ f(x) = g(x)} is clopen in X -/
 
-
+lemma EquilizerOfDiscreteIsClopen (X Y: Type _) [TopologicalSpace X] [TopologicalSpace Y]
+  [DiscreteTopology Y] (f g:ContinuousMap X Y)  : 
+  IsClopen {x : X | f x = g x} := by sorry
+  
 
 /- Lemma 2 proof -/
 
@@ -56,14 +60,14 @@ space, then {x ∈ X ∣ f(x) = g(x)} is clopen in X -/
 --- Statement of the Theorem ---
 
 
-theorem Uniqueness_Of_Homotopy_Lifting (Y X E: Type _) 
+theorem UniquenessOfHomotopyLifting (Y X E: Type _) 
 [TopologicalSpace Y][TopologicalSpace X][TopologicalSpace E]
 (f:ContinuousMap E X)(hf: IsCoveringMap f)
 (H₁ H₂ : ContinuousMap Y E)(h: f ∘ H₁ = f ∘ H₂)
 (hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) : H₁ = H₂  := by sorry
 
 
---f
+
 
 /- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
 
