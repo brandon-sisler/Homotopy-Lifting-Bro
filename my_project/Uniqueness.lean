@@ -9,13 +9,6 @@ import Mathlib.Topology.Covering
 
 open Set Filter Topology
 
--- In the next example we could use `tauto` in each proof instead of knowing the lemmas
-example {α : Type _} (s : Set α) : Filter α :=
-  { sets := { t | s ⊆ t }
-    univ_sets := subset_univ s
-    sets_of_superset := fun hU hUV => Subset.trans hU hUV
-    inter_sets := fun hU hV => subset_inter hU hV }
-
 
 variable (f)
 
@@ -61,6 +54,13 @@ space, then {x ∈ X ∣ f(x) = g(x)} is clopen in X -/
 
 
 --- Statement of the Theorem ---
+
+
+theorem Uniqueness_Of_Homotopy_Lifting (Y X E: Type _) 
+[TopologicalSpace Y][TopologicalSpace X][TopologicalSpace E]
+(f:ContinuousMap E X)(hf: IsCoveringMap f)
+(H₁ H₂ : ContinuousMap Y E)(h: f ∘ H₁ = f ∘ H₂)
+(hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) : H₁ = H₂  := by sorry
 
 
 /- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
