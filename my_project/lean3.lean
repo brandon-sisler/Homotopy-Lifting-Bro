@@ -1,61 +1,70 @@
 import Mathlib.Topology.Covering
+import Mathlib.Topology.Basic
 import Mathlib.Topology.IsLocallyHomeomorph
 import Mathlib.Topology.FiberBundle.Basic
+import Mathlib.Topology.Instances.Real
+import Mathlib.SetTheory.Cardinal.Basic 
 
-variable {α : Type}{E X : Type α} [TopologicalSpace E] [TopologicalSpace X] (f : E → X) (s : Set X)
+variable {E X : Type _} [TopologicalSpace E] [TopologicalSpace X] (f : E → X) (s t: Set X)
 
 /-- A point `x : X` is evenly covered by `f : E → X` if `x` has an evenly covered neighborhood. -/
 
 --`def IsEvenlyCovered (x : X) (I : Type _) [TopologicalSpace I] `:=
 --  `DiscreteTopology I ∧ ∃ t : Trivialization I f, x ∈ t.baseSet`
-
-theorem mk (F : X → Type α) [∀ x, TopologicalSpace (F x)] [hF : ∀ x, DiscreteTopology (F x)]
+-- 
+theorem mk (F : X → Type _) [∀ x, TopologicalSpace (F x)] [hF : ∀ x, DiscreteTopology (F x)]
     (e : ∀ x ∈ s, Trivialization (F x) f) (h : ∀ (x : X) (hx : x ∈ s), x ∈ (e x hx).baseSet) :
     IsCoveringMapOn f s := fun x hx =>
   IsEvenlyCovered.to_isEvenlyCovered_preimage ⟨hF x, e x hx, h x hx⟩
 
 --If f is a covering map, from covering space E to topological space X, then f is continuous
-lemma continuous (hf : IsCoveringMap f) : Continuous f := by sorry
+lemma continuous (hf : IsCoveringMap f) : Continuous f := 
+continuous_iff_continuousOn_univ.mpr hf.isCoveringMapOn.continuousOn
+
 
 --If f is a covering map, then f is a local homeomorphism 
-lemma is_locally_homeomorph (hf : IsCoveringMap f) : IsLocallyHomeomorph f := by sorry
+lemma is_locally_homeomorph (hf : IsCoveringMap f) : IsLocallyHomeomorph f := 
+isLocallyHomeomorph_iff_isLocallyHomeomorphOn_univ.mpr hf.isCoveringMapOn.isLocallyHomeomorphOn
 
 --If f is a covering map, then it is an open map
-lemma is_open_map (hf : IsCoveringMap f) : IsOpenMap f := by sorry
+lemma is_open_map (hf : IsCoveringMap f) : IsOpenMap f := hf.isLocallyHomeomorph.isOpenMap
 
 --If f is a covering map and a surjective function then it is a quotient map
-lemma quotient_map (hf : IsCoveringMap f) (hf' : Function.Surjective f) : QuotientMap f := by sorry
+lemma quotient_map (hf : IsCoveringMap f) (hf' : Function.Surjective f) : QuotientMap f := hf.isOpenMap.to_quotientMap hf.continuous hf'
 
--- `noncomputable def to_homeomorph (hf : IsCoveringMap f)`
---   `(h : Function.Bijective f) : Homeomorph E X :=`
---` Homeomorph.homeomorphOfContinuousOpen (equiv.of_bijective) hf.continuous hf.is_open_map`
+-- If f is a bijective covering map then it is a homeomorphism
+noncomputable def to_homeomorph (hf : IsCoveringMap f)
+(h : Function.Bijective f) : Homeomorph E X := by sorry
 
--- `lemma is_locally_constant_card (hf : is_covering_map f) :`
---  ` is_locally_constant (λ x, #(f ⁻¹' {x})) := `
--- `(is_locally_constant.iff_exists_open _).2 $ λ x, let ⟨t, ht⟩ := (hf x).2 in`
---  ` ⟨_, t.open_base_set, ht, λ y hy, (t.preimage_singleton_homeomorph hy).to_equiv.cardinal_eq⟩`
+--WHAT IS THAT HASHTAG
+lemma is_locally_constant_card (hf : is_covering_map f) :
+  IsLocallyConstant (fun x => #(f ⁻¹' {x})) := by sorry
 
 lemma is_fiber_bundle.is_covering_map {F : Type α} [TopologicalSpace F] : IsCoveringMap f := by sorry
 
-lemma clopen_set_intersect_connected_components_whole_set (Y: Type α) [TopologicalSpace Y]
+lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [TopologicalSpace Y]
   (S : Set Y) (hS : IsClopen S) (w : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S) :
   S = Set.univ := by sorry
 
-lemma is_open_inter_of_coe_preim {X : Type α} [TopologicalSpace X] (s t : Set X) (hs : IsOpen s)
-  --(h : IsOpen((coe : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by sorry
+theorem is_open_inter_of_coe_preim' (hs : IsOpen s)
+  (h : IsOpen ((coe : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by sorry
 
-lemma is_open_of_is_open_coe (Y:Type α) [TopologicalSpace Y] (A: Set Y)
---(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((coe : U → Y) ⁻¹' A)) : IsOpen A := by sorry
+scoped[Topology] notation "𝓝[" s "] " x:100 => nhdsWithin x s
 
-lemma is_closed_of_is_closed_coe (Y:Type α) [TopologicalSpace Y] (A: Set Y)
+--PROBLEM HERE
+lemma is_open_of_is_open_coe (A: Set Y)
+(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝[x]), IsOpen ((coe : U → Y) ⁻¹' A)) : IsOpen A := by sorry
+
+lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
 --(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClosed ((coe : U → Y) ⁻¹' A)) : IsClosed A := by sorry
 
-lemma is_clopen_of_is_clopen_coe (Y:Type α) [TopologicalSpace Y] (A: Set Y)
---(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), is_clopen ((coe : U → Y) ⁻¹' A)) : IsClopen A : =by sorry 
+-- lemma is_clopen_of_is_clopen_coe (Y:Type α) [TopologicalSpace Y] (A: Set Y)
+-- --(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), is_clopen ((coe : U → Y) ⁻¹' A)) : IsClopen A : =by sorry 
 
-theorem clopen_equalizer_of_discrete {X Y : Type α} [TopologicalSpace X] [TopologicalSpace Y]
-  [DiscreteTopology Y] {f g : X → Y} (hf : Continuous f) (hg : Continuous g) :
-  --IsClopen {x : X | f x = g x} := (is_clopen_discrete (set.diagonal Y)).preimage (hf.prod_mk hg)
+
+theorem clopen_equalizer_of_discrete [TopologicalSpace Y]
+  [DiscreteTopology Y] {h g : X → Y} (hf : Continuous h) (hg : Continuous g) :
+  IsClopen {x : X | h x = g x} := by sorry
 
 
 lemma tautology : true := rfl
