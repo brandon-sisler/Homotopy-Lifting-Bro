@@ -38,7 +38,7 @@ open Set Filter Topology
 such that U_y ∩ S is clopen in U_y -/
 
 lemma ClopenIffNbhdClopen (Y: Type _) [TopologicalSpace Y](S : Set Y) :
- ∀ y :  Y, ∃ U: Set Y,  U ∈ 𝓝 y  ↔ IsClopen S := by sorry
+ (∀ y :  Y, ∃ U: Set Y,  U ∈ 𝓝 y)  ↔ IsClopen S := by sorry
 
 
 
@@ -57,6 +57,14 @@ lemma EquilizerOfDiscreteIsClopen (X Y: Type _) [TopologicalSpace X] [Topologica
 /- Lemma 2 proof -/
 
 
+
+/- Lemma 3 stating that if a clopen set S ⊆ Y intersects with all the connected components of Y, then S = Y -/
+
+
+
+/- Lemma 3 proof -/
+
+
 --- Statement of the Theorem ---
 
 
@@ -64,18 +72,21 @@ theorem UniquenessOfHomotopyLifting (Y X E: Type _)
 [TopologicalSpace Y][TopologicalSpace X][TopologicalSpace E]
 (f:ContinuousMap E X)(hf: IsCoveringMap f)
 (H₁ H₂ : ContinuousMap Y E)(h: f ∘ H₁ = f ∘ H₂)
-(hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) : H₁ = H₂  := by sorry
+(hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) : H₁ = H₂  := by 
 
-
-
+  
 
 /- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
-
-
+  let S:= {y:Y | H₁ y = H₂ y}
+  
 
 /- S is clopen proof Part 1 : by Lemma 1 it suffices to prove that U_y ∩ S is
 clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
 of covering and U_y := F^{-1}(V_y)) -/
+
+  have ClopenS : IsClopen S := by
+   rw [← ClopenIffNbhdClopen]
+   sorry
 
 
 
@@ -103,11 +114,10 @@ by Lemma 2 -/
 
 
 
-/- Proof that S clopen in Y connected → S = Y or S = ∅ -/
+/- Proof that S = Y using Lemma 3 -/
 
 
 
-/- (S ≠ ∅ := by Statement hypothesis) → S = Y → H₁(y) = H₂(y) ∀ y ∈ Y -/
 
 
 
