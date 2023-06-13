@@ -1,4 +1,5 @@
 import Mathlib.Topology.Homotopy.Path
+import Mathlib.Topology.Bases
 open Set
 
 variable {X : Type _} [TopologicalSpace X] (x₀ : X) {x₁ : X }
@@ -12,10 +13,33 @@ def coverSet :=
 #check coverSet
 #synth TopologicalSpace (Path x₀ x₁)
 
-#synth TopologicalSpace (coverSet x₀)
+--example : IsOpen (univ : Cover) := 
+ -- isOpen_univ
 
-example : IsOpen (univ : Cover) := 
-  isOpen_univ
+open TopologicalSpace
+
+example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U → V ∈ s)
+  (h' : ∀ x: X, ∃ U ∈ s, x ∈ U) :
+    IsTopologicalBasis (t := generateFrom s) s := by
+  let _ := generateFrom s
+  apply isTopologicalBasis_of_open_of_nhds
+  · intros u hu
+    exact isOpen_generateFrom_of_mem hu
+  · intros x U hx hU
+    induction hU with
+    | basic V hV => use V, hV, hx
+    | univ => simpa using h' x
+    | inter V W _ _ h₃ h₄ =>
+        rcases h₃ hx.1 with ⟨R, _, hxR, hRV⟩
+        rcases h₄ hx.2 with ⟨S, S_in, hxS, hSW⟩
+        refine ⟨R ∩ S, ?_, ⟨hxR, hxS⟩, ?_⟩
+        · exact h _ _ S_in (Set.inter_subset_right R S)
+        · exact Set.inter_subset_inter hRV hSW
+    | sUnion S _ hS =>
+        rcases hx with ⟨T, T_in, hxT⟩
+        rcases hS T T_in hxT with ⟨V, V_in, hxV, hVT⟩
+        use V, V_in, hxV
+        exact Set.subset_sUnion_of_subset S T hVT T_in
 
 
 
