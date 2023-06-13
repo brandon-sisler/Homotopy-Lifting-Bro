@@ -24,7 +24,7 @@ Notation:
 `Trivialization F proj` : local trivialization of `proj : E → B` with fiber `F`
 `IsEvenlyCovered x ι` : `DiscreteTopology ι ∧ ∃ t : Trivialization ι p, x ∈ t.baseSet`
                       : fiber over x has discrete topology & has a local trivialization
-`IsCoveringMap p` : `∀ x, IsEvenlyCovered (f x) (f ⁻¹' {x})`
+`IsCoveringMap (f : E → X)` : `∀ x, IsEvenlyCovered (f x) (f ⁻¹' {x})`
 
 `∀ᶠ y ∈ 𝓝 x, P y` : exists a nbhd `U` of `x` such that `y ∈ U → P y`
 
@@ -38,13 +38,34 @@ Theorems:
 
 variable {X Y E : Type _}
 variable [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace E]
+variable (f : Y × I → X) (p : E → X) (F₀ : Y → E)
 variable (x : X) (y : Y) (t : I)
 
-lemma nbhd_in_trivialization (y : Y) (t : I) (Continuous f : Y × I → X) (IsCoveringMap p : E → X) :
-  ∃ Nyt ∈ 𝓝 (y, t), ∃ U : Set X, ∃ t : Trivialization (p ⁻¹' U) p,
-  f '' Nyt ⊆ t.baseSet := by
-    
-    sorry
+lemma nbhd_in_trivialization (y : Y) (t : I) (hf : Continuous f) (hp : IsCoveringMap p) :
+  ∃ triv : Trivialization (p ⁻¹' {f (y, t)}) p, ∃ Nyt ∈ 𝓝 (y, t),
+  f '' Nyt ⊆ triv.baseSet := by
+    -- find the trivialization
+    specialize hp <| f (y, t)
+    let triv : Trivialization (p ⁻¹' {f (y, t)}) p := by
+      apply IsEvenlyCovered.toTrivialization hp
+    use triv
+    -- let U : Set (X) := triv.baseSet
+    use f ⁻¹' triv.baseSet
+    constructor
+    . rw [mem_nhds_iff]
+      use f ⁻¹' triv.baseSet
+      constructor
+      . rfl
+      . constructor
+        . exact IsOpen.preimage hf triv.open_baseSet
+        . rw [Set.mem_preimage]
+          exact IsEvenlyCovered.mem_toTrivialization_baseSet hp
+    . exact Set.image_preimage_subset f triv.baseSet
+
+#check 𝓝 (y, t).2
+#check nhds_prod_eq
+
+lemma nbhd_to_interval 
 
 theorem homotopy_lift (Continuous f : Y × I → X) (IsCoveringMap p : E → X) (Continuous F₀ : Y → E) :
   ∃ Continuous F : Y × I → E, p ∘ F = f ∧ (fun y ↦ F ⟨y, 0⟩) = F₀ := by
