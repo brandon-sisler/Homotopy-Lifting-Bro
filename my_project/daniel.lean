@@ -64,8 +64,10 @@ lemma nbhd_in_trivialization (y : Y) (t : I) (hf : Continuous f) (hp : IsCoverin
 
 #check 𝓝 (y, t).2
 #check nhds_prod_eq
+-- rw [(nhds_basis_Ioo t).mem_iff] at ho
 
-lemma nbhd_to_interval 
+lemma nbhd_to_closed_interval (ho : O ∈ 𝓝 t) : ∃ a b : ℝ, a < b ∧ Set.Icc a b ⊆ O := by
+    
 
 theorem homotopy_lift (Continuous f : Y × I → X) (IsCoveringMap p : E → X) (Continuous F₀ : Y → E) :
   ∃ Continuous F : Y × I → E, p ∘ F = f ∧ (fun y ↦ F ⟨y, 0⟩) = F₀ := by
