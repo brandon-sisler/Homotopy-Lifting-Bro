@@ -1,11 +1,11 @@
 import Mathlib.Topology.Covering
+import Mathlib.Topology.Connected 
 import Mathlib.Topology.Basic
 import Mathlib.Topology.IsLocallyHomeomorph
 import Mathlib.Topology.FiberBundle.Basic
 import Mathlib.Topology.Instances.Real
 import Mathlib.SetTheory.Cardinal.Basic 
 import Mathlib.Topology.LocallyConstant.Basic
---HOW TO OPEN LOCALE
 
 open Cardinal Topology
 
@@ -17,26 +17,40 @@ variable {E X : Type _} [TopologicalSpace E] [TopologicalSpace X] (f : E → X) 
 
 -- If f is a bijective covering map then it is a homeomorphism
 noncomputable def toHomeomorph (hf : IsCoveringMap f)
-(h : Function.Bijective f) : Homeomorph E X := by 
-  have equiv : E ≃ X := by sorry   
-  have con_fw : Continuous ↑equiv := by sorry 
-  have op_fw : IsOpenMap ↑equiv := by sorry
-  apply Homeomorph.homeomorphOfContinuousOpen equiv con_fw op_fw 
+(h : Function.Bijective f) : Homeomorph E X := 
+  Homeomorph.homeomorphOfContinuousOpen (Equiv.ofBijective f h ) (IsCoveringMap.continuous hf) (IsCoveringMap.isOpenMap hf)
 
---WHAT IS THAT HASHTAG
+-- homeomorph.homeomorph_of_continuous_open (equiv.of_bijective f h) hf.continuous hf.is_open_map
 lemma is_locally_constant_card (hf : IsCoveringMap f) :
   IsLocallyConstant (fun x => #(f ⁻¹' {x})) := by sorry
+-- (is_locally_constant.iff_exists_open _).2 $ λ x, let ⟨t, ht⟩ := (hf x).2 in
+--   ⟨_, t.open_base_set, ht, λ y hy, (t.preimage_singleton_homeomorph hy).to_equiv.cardinal_eq⟩
 
-lemma is_fiber_bundle.is_covering_map {F : Type _} [TopologicalSpace F] : IsCoveringMap f := by sorry
 
 lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [TopologicalSpace Y]
   (S : Set Y) (hS : IsClopen S) (w : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S) :
-  S = Set.univ := by sorry
+  S = Set.univ := by 
+  apply Set.eq_univ_of_forall 
+  intro x 
+  specialize w x 
+  cases' w with y h1
+  have con_same : connectedComponent x = connectedComponent y := connectedComponent_eq (h1.1)
+  have y_con: connectedComponent y ⊆ S := by 
+    apply IsClopen.connectedComponent_subset
+    exact hS
+    exact h1.2
+  have con_sub : connectedComponent x ⊆ S := by 
+    rw[con_same] 
+    exact y_con
+  have x_in_con : x ∈ connectedComponent x := mem_connectedComponent 
+  exact con_sub x_in_con 
+-- set.eq_univ_of_forall $ λ x, let ⟨y, hy, h⟩ := w x in
+--   hS.connected_component_subset h (connected_component_eq hy ▸ mem_connected_component)
+
 
 theorem is_open_inter_of_coe_preim' (hs : IsOpen s)
   (h : IsOpen ((Subtype.val : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by sorry
 
---PROBLEM HERE
 lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
     (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by
   sorry
