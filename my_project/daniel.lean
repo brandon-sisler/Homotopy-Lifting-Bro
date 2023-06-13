@@ -26,6 +26,8 @@ Notation:
                       : fiber over x has discrete topology & has a local trivialization
 `IsCoveringMap p` : `∀ x, IsEvenlyCovered (f x) (f ⁻¹' {x})`
 
+`∀ᶠ y ∈ 𝓝 x, P y` : exists a nbhd `U` of `x` such that `y ∈ U → P y`
+
 Theorems:
 `toTrivialization` : gets local trivialization above a point from a covering map
 `IsCompact.elim_finite_subcover` : reduces open cover to finite cover
@@ -34,11 +36,12 @@ Theorems:
 `isCompact_prod` : product of compact sets is compact
 -/
 
-variable {α β ε : Type _}
-variable [TopologicalSpace α] [TopologicalSpace β] [TopologicalSpace ε]
-variable (X : Set α) (Y : Set β) (E : Set ε)
+variable {X Y E : Type _}
+variable [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace Z]
 variable (x : X) (y : Y) (t : I)
 
-theorem homotopy_lift (Continuous f : Y ×ˢ I → X) (IsCoveringMap p : E → X) (Continuous F₀ : Y → E) :
-  ∃ Continuous F : Y ×ˢ I → E, p ∘ F = f ∧ (fun y ↦ F ⟨y, (0:I)⟩, _) = F₀ := by
+
+
+theorem homotopy_lift (Continuous f : Y × I → X) (IsCoveringMap p : E → X) (Continuous F₀ : Y → E) :
+  ∃ Continuous F : Y × I → E, p ∘ F = f ∧ (fun y ↦ F ⟨y, 0⟩) = F₀ := by
     sorry
