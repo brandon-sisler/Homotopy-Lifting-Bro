@@ -1,3 +1,24 @@
+--import Mathlib.Topology.Instances.Real
+import Mathlib.Topology.Homotopy.basic
+import Mathlib.Topology.IsLocallyHomeomorph
+--import Mathlib.Topology.FiberBundle.basic
+import Mathlib.Topology.LocallyConstant.basic
+import Mathlib.SetTheory.cardinal.basic
+import Mathlib.Topology.Covering
+
+
+open Set Filter Topology
+
+-- In the next example we could use `tauto` in each proof instead of knowing the lemmas
+example {α : Type _} (s : Set α) : Filter α :=
+  { sets := { t | s ⊆ t }
+    univ_sets := subset_univ s
+    sets_of_superset := fun hU hUV => Subset.trans hU hUV
+    inter_sets := fun hU hV => subset_inter hU hV }
+
+
+variable (f)
+
 
 
 
