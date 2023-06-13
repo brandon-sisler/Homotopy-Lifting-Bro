@@ -18,8 +18,7 @@ theorem mk (F : X → Type _) [∀ x, TopologicalSpace (F x)] [hF : ∀ x, Discr
   IsEvenlyCovered.to_isEvenlyCovered_preimage ⟨hF x, e x hx, h x hx⟩
 
 --If f is a covering map, from covering space E to topological space X, then f is continuous
-lemma continuous (hf : IsCoveringMap f) : Continuous f := 
-continuous_iff_continuousOn_univ.mpr hf.isCoveringMapOn.continuousOn
+lemma continuous (hf : IsCoveringMap f) : Continuous f := continuous_iff_continuousOn_univ.mpr hf.isCoveringMapOn.continuousOn
 
 
 --If f is a covering map, then f is a local homeomorphism 
@@ -34,7 +33,11 @@ lemma quotient_map (hf : IsCoveringMap f) (hf' : Function.Surjective f) : Quotie
 
 -- If f is a bijective covering map then it is a homeomorphism
 noncomputable def to_homeomorph (hf : IsCoveringMap f)
-(h : Function.Bijective f) : Homeomorph E X := by sorry
+(h : Function.Bijective f) : Homeomorph E X := by 
+  have equiv : E ≃ X := by sorry   
+  have con_fw : Continuous ↑equiv := by sorry 
+  have op_fw : IsOpenMap ↑equiv := by sorry
+  apply Homeomorph.homeomorphOfContinuousOpen equiv con_fw op_fw 
 
 --WHAT IS THAT HASHTAG
 lemma is_locally_constant_card (hf : is_covering_map f) :
@@ -49,17 +52,15 @@ lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [Topologic
 theorem is_open_inter_of_coe_preim' (hs : IsOpen s)
   (h : IsOpen ((coe : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by sorry
 
-scoped[Topology] notation "𝓝[" s "] " x:100 => nhdsWithin x s
-
 --PROBLEM HERE
 lemma is_open_of_is_open_coe (A: Set Y)
 (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝[x]), IsOpen ((coe : U → Y) ⁻¹' A)) : IsOpen A := by sorry
 
 lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
---(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClosed ((coe : U → Y) ⁻¹' A)) : IsClosed A := by sorry
+(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝[x]), IsClosed ((coe : U → Y) ⁻¹' A)) : IsClosed A := by sorry
 
--- lemma is_clopen_of_is_clopen_coe (Y:Type α) [TopologicalSpace Y] (A: Set Y)
--- --(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), is_clopen ((coe : U → Y) ⁻¹' A)) : IsClopen A : =by sorry 
+lemma is_clopen_of_is_clopen_coe (Y:Type α) [TopologicalSpace Y] (A: Set Y)
+(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝[x]), IsClopen ((coe : U → Y) ⁻¹' A)) : IsClopen A := by sorry 
 
 
 theorem clopen_equalizer_of_discrete [TopologicalSpace Y]
@@ -72,7 +73,7 @@ lemma tautology : true := rfl
 theorem uniqueness_of_homotopy_lifting (Y : Type α) [TopologicalSpace Y] (hf : IsCoveringMap f)
   (H₁ H₂ : ContinuousMap Y E) (h : f ∘ H₁ = f ∘ H₂)
   (hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) :
-  H₁ = H₂ := by sorry
+  H₁ = H₂ := by sorry 
 
 -- begin
 --   refine fun_like.ext H₁ H₂ (set.eq_univ_iff_forall.mp
