@@ -76,7 +76,10 @@ theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
     apply IsClopen.preimage
     exact diag_cl
     exact con_map
-  have re : (fun x => (g x, h x)) ⁻¹' Set.diagonal Y = {x |h x = g x} := by sorry
+  have re : (fun x => (g x, h x)) ⁻¹' Set.diagonal Y = {x |h x = g x} := by 
+    ext n  
+    simp
+    tauto 
   rw[←re]
   exact this
 
