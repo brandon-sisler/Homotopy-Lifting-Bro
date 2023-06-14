@@ -104,19 +104,30 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
     --rcases(path_connected_basis a).mem_iff.mp U_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U⟩
     
-    
-  
-
--- Define a potential basis for CoverSet using the slsc_pc_nbhds basis of X\
-
-
-def coverSet :=
+def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
   Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
 
+#check UniversalCover
+
+def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X): Set (Set ( UniversalCover X x₀ )) :=
+  -- Need to take the slsc_pc_nbhds and turn them into a collection of sets insize of UniversalCover 
+  -- (B : slsc_pc_nbhds X)
+  sorry
+  
+instance (X : Type _) [TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space X] (x₀: X): 
+    TopologicalSpace (UniversalCover X x₀) where
+  IsOpen := 
+  -- Would like to define the topology to be everything generated from the sets in 
+  -- lifts_of_slsc_pc_nbhds
+  -- Can we use generateFrom(lifts_of_slsc_pc_nbhds X) ?
+
+  isOpen_univ := _
+  isOpen_inter := _
+  isOpen_sUnion := _
 
 
 
-#exit
 
 
-Sigma 
+
+
