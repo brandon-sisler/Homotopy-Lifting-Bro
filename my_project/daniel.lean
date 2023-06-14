@@ -61,9 +61,5 @@ lemma nbhd_in_trivialization (y : Y) (t : I) (hf : Continuous f) (hp : IsCoverin
           exact IsEvenlyCovered.mem_toTrivialization_baseSet hp
     . exact Set.image_preimage_subset f triv.baseSet
 
-lemma cover_to_partition {ι ι' : Type _} (U : Finset ι → Set I) (hUo : ∀ i, IsOpen (U i))
-  (hI : I ⊆ ⋃ i, U i) : 1 + 1 = 2 := by
-    sorry
-
 theorem homotopy_lift (hf : Continuous f) (hp : IsCoveringMap p) (hF₀ : Continuous F₀) :
   ∃ F : Y × I → E, Continuous F ∧ p ∘ F = f ∧ (fun y ↦ F (y, 0)) = F₀ := sorry
