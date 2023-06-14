@@ -48,18 +48,28 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 
 --Definition of local path connectedness
 --(From Topology.PathConnected)
-
+#check Subtype.val
 
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
+-- ⟨ x, h ⟩ 
 
-def slsc_nbhd (X: Type _)[TopologicalSpace X](x:X)(U: Set X): Prop :=IsOpen U ∧ sorry 
+def slsc_subspace (X: Type _)[TopologicalSpace X](x:X)(U: Set X)(h: x ∈ U ): Prop := sorry 
+
+-- TODO:
+-- 1. Tell Lean U is a subspace of X
+-- 2. indicate i^{-1}(x) : U
+-- 3. Use i which we should get from 1 to create a object 
+-- i ∘ γ : Path x x where \gamma : Path i^{-1}(x) i^{-1} (x)
+-- 4. Prove [i ∘ γ ] = [x] where latter is the constant path at x.
 
 
+def slsc_pc_subspace (X: Type _)[TopologicalSpace X](U: Set X): Prop :=
+  ∃ x∈ U, slsc_subspace
 
 --Definition of semi locally simply connected
 
 class slsc_space (X: Type _)[TopologicalSpace X]  where
-   slsc_nbhd_exists: ∀ x : X, ∃ U : Set X → IsOpen U → x∈ U →  slsc_nbhd X x U
+   slsc_nbhd_exists : ∀ x : X, ∃ U : Set X, IsOpen U → (h: x ∈ U) → slsc_subspace X x U h
 
   
 -- To show the path connected subsets of X is a basis
@@ -67,13 +77,13 @@ class slsc_space (X: Type _)[TopologicalSpace X]  where
 
 
 -- Define the potential basis whose elements are slsc and path connected
-
+--(Make this smaller)
 def slsc_pc_nbhds (X: Type _)[TopologicalSpace X]: Set (Set X):= 
-  { U : Set X | IsOpen U ∧ ∃ x: X,  x∈ U ∧   (slsc_nbhd X x U ∧ IsPathConnected U)} 
+  { U : Set X | IsOpen U ∧ (∃ x : U, slsc_subspace X x U h ∧ IsPathConnected U)} 
 
 -- To show that the slsc and path connected collection is a basis when X is a locally path connected space
-lemma slsc_pc_basis (X: Type _)[TopologicalSpace X](LocPathConnectedSpace X)(slsc_space X):
-  IsTopologicalBasis slsc_pc_nbhds X :=by sorry
+lemma slsc_pc_nbhds__is_basis (X: Type _)[TopologicalSpace X][LocPathConnectedSpace X]:
+  IsTopologicalBasis (slsc_pc_nbhds X) :=by sorry
 
 -- Define a potential basis for CoverSet using the slsc_pc_nbhds basis of X\
 
