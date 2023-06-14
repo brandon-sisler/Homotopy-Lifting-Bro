@@ -61,5 +61,12 @@ lemma nbhd_in_trivialization (y : Y) (t : I) (hf : Continuous f) (hp : IsCoverin
           exact IsEvenlyCovered.mem_toTrivialization_baseSet hp
     . exact Set.image_preimage_subset f triv.baseSet
 
+lemma lift_at_point (hf : Continuous f) (hp : IsCoveringMap p) {y : Y} (hN : N ∈ 𝓝 y)
+  {n : ℕ} {J : Fin n → I} (hJ0 : J 0 = 0) (hJ1 : J (n-1) = 1)
+  (hJo : ∀ i : Fin n, i > 0 → J (i - 1) < J i) (h : ∀ i : Fin n, i > 0 →
+    ∃ (triv : Trivialization (p ⁻¹' {f (y, J i)}) p), f '' (N ×ˢ I) ⊆ triv.baseSet) :
+  ∃ Fy: I → E, p ∘ Fy (t) = f (y, t) := by
+    sorry
+
 theorem homotopy_lift (hf : Continuous f) (hp : IsCoveringMap p) (hF₀ : Continuous F₀) :
   ∃ F : Y × I → E, Continuous F ∧ p ∘ F = f ∧ (fun y ↦ F (y, 0)) = F₀ := sorry
