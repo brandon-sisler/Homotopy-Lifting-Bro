@@ -8,8 +8,6 @@ variable {X : Type _} [TopologicalSpace X] (x₀ : X) {x₁ : X }
 
 #check X
 
-def coverSet :=
-  Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
 
 #check coverSet
 #synth TopologicalSpace (Path x₀ x₁)
@@ -101,17 +99,8 @@ lemma slsc_pc_nbhds_is_basis (X: Type _)[TopologicalSpace X][LocPathConnectedSpa
 --    a covering space of the base space X.
 -- 5. Profit?
 
-
--- Hybrid approach
-
--- Construct Hatcher's version of the universal cover
--- Then show that the topology it has is equivalent to the one described in Bourbaki 
--- by taking the quotient of the path space of X (equipped with the compact open topology) 
--- with repsect to homotopy equivalence rel boundary.
-
--- I.e.  need to show that Hatcher's basis generates the compact-open topology quotient.
-
--- 
+def coverSet :=
+  Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
 
 
 
