@@ -46,21 +46,68 @@ lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [Topologic
 #check Inducing.isOpen_iff
 #check Subtype.preimage_val_eq_preimage_val_iff
 
-theorem is_open_inter_of_coe_preim' (hs : IsOpen s)
-  (h : IsOpen ((Subtype.val : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by  sorry
+theorem is_open_inter_of_coe_preim (hs : IsOpen s)
+  (h : IsOpen ((Subtype.val : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by sorry
 -- let ⟨a, b, c⟩ := inducing_coe.is_open_iff.mp h in
 --   subtype.preimage_coe_eq_preimage_coe_iff.mp c ▸ b.inter hs
 
+
+#check mem_nhds_iff
+#check Set.inter_subset_left
+#check IsOpen.preimage
+#check is_open_inter_of_coe_preim 
+#check isOpen_iff_forall_mem_open
 lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
-    (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by
-  sorry
+    (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by 
+
+    rw[isOpen_iff_forall_mem_open] 
+    intro x 
+    specialize hA x 
+    intro xa 
+    
+
+-- is_open_iff_forall_mem_open.mpr (λ x hx, let ⟨U, hU1, hU2⟩ := hA x,
+    -- ⟨V, hV1, hV2, hV3⟩ := mem_nhds_iff.mp hU1 in ⟨A ∩ V, set.inter_subset_left A V,
+    -- is_open_inter_of_coe_preim V A hV2 ((continuous_inclusion hV1).is_open_preimage _ hU2), hx, hV3⟩)
 
 lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
-(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClosed ((Subtype.val : U → Y) ⁻¹' A)) : IsClosed A := by sorry
+(hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), IsClosed ((Subtype.val : U → Y) ⁻¹' A)) : IsClosed A := by 
+  rw [← isOpen_compl_iff]
+  apply is_open_of_is_open_coe 
+  intro x 
+  specialize hA x 
+  cases' hA with hleft hright 
+  cases' hright with h1 h2 
+  use hleft 
+  use h1 
+  dsimp at h2 
+  dsimp 
+  rw [isOpen_compl_iff]
+  exact h2   
 
 lemma is_clopen_of_is_clopen_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
-(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClopen ((Subtype.val : U → Y) ⁻¹' A)) : IsClopen A := by sorry 
+(hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), IsClopen ((Subtype.val : U → Y) ⁻¹' A)) : IsClopen A := by
+  have left : IsOpen A := by
+    apply is_open_of_is_open_coe Y A 
+    intro x 
+    specialize hA x 
+    cases' hA with hleft hright
+    use hleft 
+    cases' hright with hleft hright
+    use hleft 
+    exact hright.1 
 
+  have right : IsClosed A := by
+    apply is_closed_of_is_closed_coe Y A 
+    intro x 
+    specialize hA x 
+    cases' hA with hleft hright
+    use hleft 
+    cases' hright with hleft hright
+    use hleft 
+    exact hright.2 
+
+  exact ⟨left, right ⟩ 
 
 theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
   [DiscreteTopology Y] {h g : X → Y} (hf : Continuous h) (hg : Continuous g) :
@@ -76,7 +123,10 @@ theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
     apply IsClopen.preimage
     exact diag_cl
     exact con_map
-  have re : (fun x => (g x, h x)) ⁻¹' Set.diagonal Y = {x |h x = g x} := by sorry
+  have re : (fun x => (g x, h x)) ⁻¹' Set.diagonal Y = {x |h x = g x} := by 
+    ext n  
+    simp
+    tauto 
   rw[←re]
   exact this
 
