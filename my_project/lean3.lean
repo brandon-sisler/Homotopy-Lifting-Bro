@@ -20,8 +20,11 @@ noncomputable def toHomeomorph (hf : IsCoveringMap f)
   Homeomorph.homeomorphOfContinuousOpen (Equiv.ofBijective f h ) (IsCoveringMap.continuous hf) (IsCoveringMap.isOpenMap hf)
 
 -- homeomorph.homeomorph_of_continuous_open (equiv.of_bijective f h) hf.continuous hf.is_open_map
+
+#check IsLocallyConstant.iff_exists_open
+
 lemma is_locally_constant_card (hf : IsCoveringMap f) :
-  IsLocallyConstant (fun x => #(f ⁻¹' {x})) := by sorry
+  IsLocallyConstant (fun x => #(f ⁻¹' {x})) := by sorry 
 -- (is_locally_constant.iff_exists_open _).2 $ λ x, let ⟨t, ht⟩ := (hf x).2 in
 --   ⟨_, t.open_base_set, ht, λ y hy, (t.preimage_singleton_homeomorph hy).to_equiv.cardinal_eq⟩
 
@@ -43,32 +46,42 @@ lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [Topologic
   have x_in_con : x ∈ connectedComponent x := mem_connectedComponent 
   exact con_sub x_in_con 
 
-#check Inducing.isOpen_iff
-#check Subtype.preimage_val_eq_preimage_val_iff
 
 theorem is_open_inter_of_coe_preim (hs : IsOpen s)
-  (h : IsOpen ((Subtype.val : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by sorry
--- let ⟨a, b, c⟩ := inducing_coe.is_open_iff.mp h in
---   subtype.preimage_coe_eq_preimage_coe_iff.mp c ▸ b.inter hs
+  (h : IsOpen ((Subtype.val : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by 
 
+  rw[Inducing.isOpen_iff inducing_subtype_val] at h 
+  cases' h with m H
+  cases' H with hleft hright
+  have inter : t ∩ s = m ∩ s := by
+    rw[←Subtype.preimage_val_eq_preimage_val_iff]
+    symm 
+    exact hright 
+  rw[inter] 
+  exact IsOpen.inter hleft hs
 
 #check mem_nhds_iff
 #check Set.inter_subset_left
 #check IsOpen.preimage
 #check is_open_inter_of_coe_preim 
+#check continuous_inclusion
 #check isOpen_iff_forall_mem_open
 lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
     (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by 
 
     rw[isOpen_iff_forall_mem_open] 
-    intro x 
-    specialize hA x 
-    intro xa 
-    
-
+    intro x hx
+    specialize hA x
+    rcases hA with ⟨V, ⟨hV1, ⟨hV2,hV3⟩⟩ ⟩ 
+    have : A ∩ V ⊆ A := by 
+      apply Set.inter_subset_left
+    use A ∩ V 
+    constructor 
+    exact this 
+    sorry
 -- is_open_iff_forall_mem_open.mpr (λ x hx, let ⟨U, hU1, hU2⟩ := hA x,
-    -- ⟨V, hV1, hV2, hV3⟩ := mem_nhds_iff.mp hU1 in ⟨A ∩ V, set.inter_subset_left A V,
-    -- is_open_inter_of_coe_preim V A hV2 ((continuous_inclusion hV1).is_open_preimage _ hU2), hx, hV3⟩)
+--     ⟨V, hV1, hV2, hV3⟩ := mem_nhds_iff.mp hU1 in ⟨A ∩ V, set.inter_subset_left A V,
+--     is_open_inter_of_coe_preim V A hV2 ((continuous_inclusion hV1).is_open_preimage _ hU2), hx, hV3⟩)
 
 lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
 (hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), IsClosed ((Subtype.val : U → Y) ⁻¹' A)) : IsClosed A := by 
