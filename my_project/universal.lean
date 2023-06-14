@@ -9,7 +9,7 @@ variable {X : Type _} [TopologicalSpace X] (x₀ : X) {x₁ : X }
 #check X
 
 
-#check coverSet
+--#check coverSet
 #synth TopologicalSpace (Path x₀ x₁)
 
 --example : IsOpen (univ : Cover) := 
@@ -52,7 +52,7 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 -- ⟨ x, h ⟩ 
 
-def slsc_subspace (X: Type _)[TopologicalSpace X](x:X)(U: Set X)(h: x ∈ U ): Prop := sorry 
+def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop := x ∈ U ∧ sorry 
 
 -- TODO:
 -- 1. Tell Lean U is a subspace of X
@@ -62,11 +62,11 @@ def slsc_subspace (X: Type _)[TopologicalSpace X](x:X)(U: Set X)(h: x ∈ U ): P
 -- 4. Prove [i ∘ γ ] = [x] where latter is the constant path at x.
 
 
-def slsc_pc_subspace (X: Type _)[TopologicalSpace X](U: Set X): Prop :=
-  ∃ x∈ U, slsc_subspace
+def slsc_pc_subspace {X: Type _} [TopologicalSpace X] (U: Set X) : Prop :=
+  ∃ x, slsc_subspace x U ∧ IsPathConnected U
 
-class slsc_space (X: Type _)[TopologicalSpace X]  where
-   slsc_nbhd_exists : ∀ x : X, ∃ U : Set X, IsOpen U → (h: x ∈ U) → slsc_subspace X x U h
+class slsc_space (X: Type _)[TopologicalSpace X] where
+   slsc_nbhd_exists : ∀ x : X, ∃ U : Set X, IsOpen U → slsc_subspace x U 
 
   
 -- To show the path connected subsets of X is a basis
@@ -76,11 +76,18 @@ class slsc_space (X: Type _)[TopologicalSpace X]  where
 -- Define the potential basis whose elements are slsc and path connected
 --(Make this smaller)
 def slsc_pc_nbhds (X: Type _)[TopologicalSpace X]: Set (Set X):= 
-  { U : Set X | IsOpen U ∧ (∃ x : U, slsc_subspace X x U h ∧ IsPathConnected U)} 
+  { U : Set X | IsOpen U ∧ slsc_pc_subspace U} 
 
 -- To show that the slsc and path connected collection is a basis when X is a locally path connected space
-lemma slsc_pc_nbhds_is_basis (X: Type _)[TopologicalSpace X][LocPathConnectedSpace X]:
-  IsTopologicalBasis (slsc_pc_nbhds X) :=by sorry
+lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnectedSpace X][slsc: slsc_space X]:
+  IsTopologicalBasis (slsc_pc_nbhds X) :=by 
+  apply isTopologicalBasis_of_open_of_nhds
+  . intro U Uslpc
+    exact Uslpc.1
+  . intro a U ainU openU 
+    
+    
+  sorry
 
 -- Define a potential basis for CoverSet using the slsc_pc_nbhds basis of X\
 
