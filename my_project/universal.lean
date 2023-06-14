@@ -1,7 +1,8 @@
 import Mathlib.Topology.Homotopy.Path
 import Mathlib.Topology.PathConnected
 import Mathlib.Topology.Bases
-open Set
+import Mathlib.Topology.Basic
+open Set Topology
 
 variable {X : Type _} [TopologicalSpace X] (x₀ : X) {x₁ : X }
 -- def baseSet : TopologicalSpace X 
@@ -17,6 +18,8 @@ variable {X : Type _} [TopologicalSpace X] (x₀ : X) {x₁ : X }
 
 open TopologicalSpace
 
+
+--Patrick's lemma that isn't applicable
 example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U → V ∈ s)
   (h' : ∀ x: X, ∃ U ∈ s, x ∈ U) :
     IsTopologicalBasis (t := generateFrom s) s := by
@@ -47,12 +50,16 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 --Definition of local path connectedness
 --(From Topology.PathConnected)
 
+-- class lpc_space {X: Type _} [TopologicalSpace X] where
+--   lpc_cond: ∀ x : X, ∀ U ∈ (nhds x).sets ∧ IsPathConnected U, ∃ V : 𝓝 x, IsPathConnected v
+
+
 -- ∀ \gamma : Path x x , 
 
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 -- ⟨ x, h ⟩ 
 
-def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop := x ∈ U ∧ sorry 
+def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop := x ∈ U ∧ x ∈ U 
 
 -- TODO:
 -- 1. Tell Lean U is a subspace of X
@@ -66,9 +73,10 @@ def slsc_pc_subspace {X: Type _} [TopologicalSpace X] (U: Set X) : Prop :=
   ∃ x, slsc_subspace x U ∧ IsPathConnected U
 
 class slsc_space (X: Type _)[TopologicalSpace X] where
-   slsc_nbhd_exists : ∀ x : X, ∃ U : Set X, IsOpen U → slsc_subspace x U 
+   slsc_nbhd_exists : ∀ x : X, ∃ U : Set X, IsOpen U ∧  slsc_subspace x U 
 
-  
+#check slsc_space.slsc_nbhd_exists
+
 -- To show the path connected subsets of X is a basis
 --(Possibly use the basis from Topology.PathConnected)
 
@@ -82,12 +90,22 @@ def slsc_pc_nbhds (X: Type _)[TopologicalSpace X]: Set (Set X):=
 lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnectedSpace X][slsc: slsc_space X]:
   IsTopologicalBasis (slsc_pc_nbhds X) :=by 
   apply isTopologicalBasis_of_open_of_nhds
+
   . intro U Uslpc
     exact Uslpc.1
-  . intro a U ainU openU 
+
+  . intro a U ainU openU
+    rcases slsc_space.slsc_nbhd_exists a with ⟨ W , ⟨openW, ⟨ ainW , slsc_condition ⟩ ⟩ ⟩ 
+    
+    have OpenUW : IsOpen (U ∩ W):= TopologicalSpace.isOpen_inter U W openU openW
+    have slscUW : slsc_subspace a (U ∩ W):= by sorry
+    have ainUW : a ∈ U ∩ W := ⟨ ainU , ainW ⟩ 
+    
+    --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
+    --rcases(path_connected_basis a).mem_iff.mp U_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U⟩
     
     
-  sorry
+  
 
 -- Define a potential basis for CoverSet using the slsc_pc_nbhds basis of X\
 
