@@ -39,9 +39,10 @@ Theorems:
 variable {X Y E : Type _}
 variable [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace E]
 variable (f : Y × I → X) (p : E → X) (F₀ : Y → E)
+variable (hf : Continuous f) (hp : IsCoveringMap p)
 variable (x : X) (y : Y) (t : I)
 
-lemma nbhd_in_trivialization (y : Y) (t : I) (hf : Continuous f) (hp : IsCoveringMap p) :
+lemma nbhd_in_trivialization (y : Y) (t : I) :
   ∃ triv : Trivialization (p ⁻¹' {f (y, t)}) p, ∃ Nyt ∈ 𝓝 (y, t), f '' Nyt ⊆ triv.baseSet := by
     -- find the trivialization
     specialize hp <| f (y, t)
@@ -61,11 +62,8 @@ lemma nbhd_in_trivialization (y : Y) (t : I) (hf : Continuous f) (hp : IsCoverin
           exact IsEvenlyCovered.mem_toTrivialization_baseSet hp
     . exact Set.image_preimage_subset f triv.baseSet
 
-lemma lift_at_point (hf : Continuous f) (hp : IsCoveringMap p) {y : Y} (hN : N ∈ 𝓝 y)
-  {n : ℕ} {J : Fin n → I} (hJ0 : J 0 = 0) (hJ1 : J (n-1) = 1)
-  (hJo : ∀ i : Fin n, i > 0 → J (i - 1) < J i) (h : ∀ i : Fin n, i > 0 →
-    ∃ (triv : Trivialization (p ⁻¹' {f (y, J i)}) p), f '' (N ×ˢ I) ⊆ triv.baseSet) :
-  ∃ Fy: I → E, p ∘ Fy (t) = f (y, t) := by
+lemma lift_from_point (s : Set I) (hso : IsOpen s) (hsc : IsConnected s) (pt : s) (Fpt : E)
+   : ∃ F : s → E, Continuous F ∧ (F pt = Fpt) := by
     sorry
 
 theorem homotopy_lift (hf : Continuous f) (hp : IsCoveringMap p) (hF₀ : Continuous F₀) :
