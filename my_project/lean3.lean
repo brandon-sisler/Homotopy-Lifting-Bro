@@ -85,7 +85,88 @@ lemma tautology : true := rfl
 theorem uniqueness_of_homotopy_lifting (Y : Type _) [TopologicalSpace Y] (hf : IsCoveringMap f)
   (H₁ H₂ : ContinuousMap Y E) (h : f ∘ H₁ = f ∘ H₂)
   (hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) :
-  H₁ = H₂ := by sorry 
+  H₁ = H₂ := by 
+
+
+/- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
+  let S:= {y:Y | H₁ y = H₂ y}
+  
+
+/- S is clopen proof Part 1 : by Lemma 1 it suffices to prove that U_y ∩ S is
+clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
+of covering and U_y := F^{-1}(V_y)) -/
+
+  have fCont: Continuous f:= by
+    exact IsCoveringMap.continuous hf 
+
+  have H1cont: Continuous H₁:= by
+    exact ContinuousMap.continuous H₁ 
+
+  have ClopenS : IsClopen S := by
+    apply is_clopen_of_is_clopen_coe
+    intro y
+    specialize hf (f (H₁ y))
+    rcases hf with ⟨DT,TrivN,xTrivN ⟩   --- x=f(H₁ y)
+    use ((f∘ H₁)⁻¹' TrivN.baseSet)  
+    have h1: ((f∘ H₁)⁻¹' TrivN.baseSet)∈ 𝓝 y:= by
+      rw [IsOpen.mem_nhds_iff]
+      exact xTrivN
+      apply  Continuous.isOpen_preimage 
+      exact Continuous.comp fCont H1cont
+      exact TrivN.open_baseSet
+    use h1
+    simp only [Set.preimage_setOf_eq]
+    sorry
+    
+
+--IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
+
+
+   sorry
+   
+
+
+
+/- S is clopen proof Part 2(a) : U_y ∩ S = {z ∈ U_y ∣ H₁(z) = H₂(z)} -/
+
+
+
+/- S is clopen proof Part 2(b) : ∃ discrete topological space D such that 
+f⁻¹(V_y) ≅ V_y × D := by defn of covering -/
+
+
+
+/- S is clopen proof Part 2(c) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} is clopen in U_y := 
+by Lemma 2 -/
+
+
+
+/- S is clopen proof Part 2(d) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} 
+= {z ∈ U_y ∣ H₁(z) = H₂(z)} and {z ∈ U_y ∣ H₁(z) = H₂(z)} clopen by 2(c) and 
+ -/
+
+
+
+/- S is clopen proof Part 2(e) : S is clopen by Part 1 and Part 2(a) -/
+
+
+
+/- Proof that S = Y using Lemma 3 -/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -- begin
 --   refine fun_like.ext H₁ H₂ (set.eq_univ_iff_forall.mp
