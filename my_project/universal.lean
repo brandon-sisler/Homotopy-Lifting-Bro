@@ -1,4 +1,5 @@
 import Mathlib.Topology.Homotopy.Path
+import Mathlib.Topology.PathConnected
 import Mathlib.Topology.Bases
 open Set
 
@@ -43,6 +44,44 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 
 
 
+
+
+--Definition of local path connectedness
+--(From Topology.PathConnected)
+
+
+--When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
+
+def slsc_nbhd (X: Type _)[TopologicalSpace X](x:X)(U: Set X): Prop :=IsOpen U ∧ sorry 
+
+
+
+--Definition of semi locally simply connected
+
+class slsc_space (X: Type _)[TopologicalSpace X]  where
+   slsc_nbhd_exists: ∀ x : X, ∃ U : Set X → IsOpen U → x∈ U →  slsc_nbhd X x U
+
+  
+-- To show the path connected subsets of X is a basis
+--(Possibly use the basis from Topology.PathConnected)
+
+
+-- Define the potential basis whose elements are slsc and path connected
+
+def slsc_pc_nbhds (X: Type _)[TopologicalSpace X]: Set (Set X):= 
+  { U : Set X | IsOpen U ∧ ∃ x: X,  x∈ U ∧   (slsc_nbhd X x U ∧ IsPathConnected U)} 
+
+-- To show that the slsc and path connected collection is a basis when X is a locally path connected space
+lemma slsc_pc_basis (X: Type _)[TopologicalSpace X](LocPathConnectedSpace X)(slsc_space X):
+  IsTopologicalBasis slsc_pc_nbhds X :=by sorry
+
+-- Define a potential basis for CoverSet using the slsc_pc_nbhds basis of X\
+
+
+
+
+
+
 -- TODO:
 
 -- 1. Construct the path space equipped with the compact open topology
@@ -64,12 +103,6 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 -- I.e.  need to show that Hatcher's basis generates the compact-open topology quotient.
 
 -- 
-
-
-
-
-
-
 
 
 
