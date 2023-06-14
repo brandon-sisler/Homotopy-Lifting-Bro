@@ -81,7 +81,7 @@ def slsc_pc_nbhds (X: Type _)[TopologicalSpace X]: Set (Set X):=
   { U : Set X | IsOpen U ∧ (∃ x : U, slsc_subspace X x U h ∧ IsPathConnected U)} 
 
 -- To show that the slsc and path connected collection is a basis when X is a locally path connected space
-lemma slsc_pc_nbhds__is_basis (X: Type _)[TopologicalSpace X][LocPathConnectedSpace X]:
+lemma slsc_pc_nbhds_is_basis (X: Type _)[TopologicalSpace X][LocPathConnectedSpace X]:
   IsTopologicalBasis (slsc_pc_nbhds X) :=by sorry
 
 -- Define a potential basis for CoverSet using the slsc_pc_nbhds basis of X\
