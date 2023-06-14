@@ -56,10 +56,24 @@ lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
   sorry
 
 lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
-(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClosed ((Subtype.val : U → Y) ⁻¹' A)) : IsClosed A := by sorry
+(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClosed ((Subtype.val : U → Y) ⁻¹' A)) : IsClosed A := by 
+  rw [← isOpen_compl_iff]
+  apply is_open_of_is_open_coe 
+  intro x 
+  specialize hA x 
+  cases' hA with hleft hright 
+  cases' hright with h1 h2 
+  use hleft 
+  use h1 
+  dsimp at h2 
+  dsimp 
+  rw [isOpen_compl_iff]
+  exact h2   
+
+-- ⟨ is_open_of_is_open_coe Y Aᶜ (λ x, let ⟨U, hU,hN⟩ := hA x in ⟨ U, hU , hN.1 ⟩) ⟩
 
 lemma is_clopen_of_is_clopen_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
-(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClopen ((Subtype.val : U → Y) ⁻¹' A)) : IsClopen A := by
+(hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), IsClopen ((Subtype.val : U → Y) ⁻¹' A)) : IsClopen A := by
   have left : IsOpen A := by
     apply is_open_of_is_open_coe Y A 
     intro x 
@@ -81,11 +95,6 @@ lemma is_clopen_of_is_clopen_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
     exact hright.2 
 
   exact ⟨left, right ⟩ 
-
-
--- ⟨is_open_of_is_open_coe  Y A (λ x, let  ⟨ z,hz,hhz⟩:= hA x in ⟨ z,hz,hhz.1⟩  ) ,
---  is_closed_of_is_closed_coe  Y A (λ x, let  ⟨ z,hz,hhz⟩:= hA x in ⟨ z,hz,hhz.2⟩  )⟩
-
 
 theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
   [DiscreteTopology Y] {h g : X → Y} (hf : Continuous h) (hg : Continuous g) :
