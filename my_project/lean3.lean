@@ -166,11 +166,10 @@ of covering and U_y := F^{-1}(V_y)) -/
       exact TrivN.open_baseSet
     use h1
     simp only [Set.preimage_setOf_eq]
-    let compH1:= Prod.snd ∘  TrivN.toFun ∘ H₁ 
     let compH2:=  Prod.fst ∘  TrivN.toFun ∘ H₁
-    have compH1cont : Continuous compH1 := by
-      apply Iff.mp continuous_coinduced_dom 
-      sorry
+    
+
+      
     sorry
     
 
