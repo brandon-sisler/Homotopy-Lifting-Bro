@@ -48,7 +48,8 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 
 --Definition of local path connectedness
 --(From Topology.PathConnected)
-#check Subtype.val
+
+-- ∀ \gamma : Path x x , 
 
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 -- ⟨ x, h ⟩ 
@@ -65,8 +66,6 @@ def slsc_subspace (X: Type _)[TopologicalSpace X](x:X)(U: Set X)(h: x ∈ U ): P
 
 def slsc_pc_subspace (X: Type _)[TopologicalSpace X](U: Set X): Prop :=
   ∃ x∈ U, slsc_subspace
-
---Definition of semi locally simply connected
 
 class slsc_space (X: Type _)[TopologicalSpace X]  where
    slsc_nbhd_exists : ∀ x : X, ∃ U : Set X, IsOpen U → (h: x ∈ U) → slsc_subspace X x U h
