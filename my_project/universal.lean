@@ -49,14 +49,21 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 --Definition of local path connectedness
 --(From Topology.PathConnected)
 
+-- ∀ \gamma : Path x x , 
 
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 
-def slsc_nbhd (X: Type _)[TopologicalSpace X](x:X)(U: Set X): Prop :=IsOpen U ∧ sorry 
+def slsc_nbhd (X: Type _)[TopologicalSpace X](x:X)(U: Set X): Prop := 
+  IsOpen U ∧ (  )
+
+-- TODO:
+-- 1. Tell Lean U is a subspace of X
+-- 2. indicate i^{-1}(x) : U
+-- 3. Use i which we should get from 1 to create a object 
+-- i ∘ γ : Path x x where \gamma : Path i^{-1}(x) i^{-1} (x)
+-- 4. Prove [i ∘ γ ] = [x] where latter is the constant path at x.
 
 
-
---Definition of semi locally simply connected
 
 class slsc_space (X: Type _)[TopologicalSpace X]  where
    slsc_nbhd_exists: ∀ x : X, ∃ U : Set X → IsOpen U → x∈ U →  slsc_nbhd X x U
