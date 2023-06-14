@@ -7,6 +7,7 @@ import Mathlib.SetTheory.cardinal.basic
 import Mathlib.Topology.Covering
 --import Mathlib.Topology.basic
 
+set_option maxHeartbeats 0
 
 open Set Filter Topology
 
@@ -29,16 +30,16 @@ open Set Filter Topology
 
 
 
+variable (Y:Type _)  [TopologicalSpace Y](S : Set Y)
 
-
-
+ 
 
 
 /- Lemma 1 stating that a set S ⊆ Y is clopen in Y ↔ ∀ y ∈ Y ∃ nbhd U_y of y 
 such that U_y ∩ S is clopen in U_y -/
 
 lemma ClopenIffNbhdClopen (Y: Type _) [TopologicalSpace Y](S : Set Y) :
- (∀ y :  Y, ∃ U: Set Y,  U ∈ 𝓝 y)  ↔ IsClopen S := by sorry
+ (∀ y :  Y, ∃ U: Set Y,  U ∈ 𝓝 y, IsClopen (U⁻¹ S )) ↔ IsClopen S := by sorry
 
 
 
@@ -60,9 +61,27 @@ lemma EquilizerOfDiscreteIsClopen (X Y: Type _) [TopologicalSpace X] [Topologica
 
 /- Lemma 3 stating that if a clopen set S ⊆ Y intersects with all the connected components of Y, then S = Y -/
 
+#check connectedComponent
+#check IsClopen.connectedComponent_subset
+
+lemma ClopenInterConnectedCompUniv (Y: Type _)[TopologicalSpace Y](S: Set Y)(hS: IsClopen S)
+(h: ∀x :Y, ∃ y∈ connectedComponent x, y∈ S): S=Set.univ := by
 
 
 /- Lemma 3 proof -/
+  ext z                   
+  constructor
+  · exact fun _ => trivial
+  intro 
+  specialize h z
+  rcases h with ⟨y,hy, yS⟩ 
+  have h1:= IsClopen.connectedComponent_subset hS yS
+  have h2 : z∈ connectedComponent y := by
+    rw [← connectedComponent_eq_iff_mem]
+    exact connectedComponent_eq hy
+  apply h1
+  exact h2
+
 
 
 --- Statement of the Theorem ---
@@ -87,6 +106,7 @@ of covering and U_y := F^{-1}(V_y)) -/
   have ClopenS : IsClopen S := by
    rw [← ClopenIffNbhdClopen]
    sorry
+   
 
 
 
