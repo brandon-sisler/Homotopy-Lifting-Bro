@@ -23,8 +23,8 @@ noncomputable def toHomeomorph (hf : IsCoveringMap f)
 
 #check IsLocallyConstant.iff_exists_open
 
-lemma is_locally_constant_card (hf : IsCoveringMap f) :
-  IsLocallyConstant (fun x => #(f ⁻¹' {x})) := by sorry 
+--lemma is_locally_constant_card (hf : IsCoveringMap f) :
+--  IsLocallyConstant (fun x => #(f ⁻¹' {x})) := by sorry 
 -- (is_locally_constant.iff_exists_open _).2 $ λ x, let ⟨t, ht⟩ := (hf x).2 in
 --   ⟨_, t.open_base_set, ht, λ y hy, (t.preimage_singleton_homeomorph hy).to_equiv.cardinal_eq⟩
 
