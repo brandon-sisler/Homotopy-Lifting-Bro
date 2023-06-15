@@ -5,6 +5,7 @@ import Mathlib.Topology.Algebra.Order.Compact
 import Mathlib.Topology.Instances.Real
 import Mathlib.Topology.UnitInterval
 import Mathlib.Topology.Order.Basic
+import Mathlib.Topology.SubsetProperties
 import Mathlib.Data.Set.Prod
 import Mathlib.Data.Set.Lattice
 
@@ -83,8 +84,36 @@ theorem existence_of_homotopy_lifting
       exact (hab y k2)
     have hopen : ∀ (t: I), IsOpen (box y t) := by
       intro t
+      simp
+      rw [isOpen_prod_iff]
+      intro a b
+      intro h
+      unfold Set.prod at h
+      simp at h
+      use U y t
+      use (Ioo (ab y t).fst (ab y t).snd)
+      constructor
+      exact (hU y t).1
+      constructor
+      exact isOpen_Ioo
+      constructor
+      exact h.1
+      constructor
+      unfold Ioo
+      simp
+      exact ⟨h.2.1, h.2.2⟩
+      intro qq hq
+      unfold Set.prod
+      simp
+      constructor
+      exact hq.1
+      exact hq.2
+    have I_is_compact : IsCompact (prod {y} (univ : Set I)) := by
+      exact isCompact_singleton.prod isCompact_univ
+    have := box y
+    have := IsCompact.elim_finite_subcover I_is_compact (box y) hopen hcover
+    
 
-      sorry
     sorry
   sorry
 
@@ -101,8 +130,9 @@ theorem existence_of_homotopy_lifting
   ∀ y : Y, ∃ U ∈ 𝓝 y, ∃ Ft : I → Y → Xt, ContinuousOn (uncurry Ft) (univ ×ˢ U) 
   ∧ EqOn (Ft 0) F0t U 
   ∧ EqOn (uncurry F) (p ∘ uncurry Ft) (univ ×ˢ U) := by sorry 
+  
   /-theorem 
-  is_compact.elim_finite_subcover {α : Type u} [topological_space α]{s : set α} {ι : Type v} 
+  IsCompact.elim_finite_subcover {α : Type u} [topological_space α]{s : set α} {ι : Type v} 
    (hs : is_compact s) 
    (U : ι → set α) 
    (hUo : ∀ (i : ι), is_open (U i)) 
