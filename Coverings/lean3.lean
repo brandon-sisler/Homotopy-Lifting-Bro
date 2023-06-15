@@ -274,8 +274,17 @@ of covering and U_y := F^{-1}(V_y)) -/
 
 --IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
 
-
-  sorry
+  have Hyp : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S := by
+    exact hC
+  have SisUniv : S = Set.univ := by 
+    apply clopen_set_intersect_connected_components_whole_set 
+    exact ClopenS 
+    exact Hyp 
+  ext z
+  have K : z ∈ S := by  
+    rw [SisUniv]
+    exact trivial 
+  exact K 
    
 
 
