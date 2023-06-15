@@ -47,14 +47,22 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 
 
 
---Definition of local path connectedness
---(From Topology.PathConnected)
+
 
 -- class lpc_space {X: Type _} [TopologicalSpace X] where
 --   lpc_cond: ∀ x : X, ∀ U ∈ (nhds x).sets ∧ IsPathConnected U, ∃ V : 𝓝 x, IsPathConnected v
 
 
 -- ∀ \gamma : Path x x , 
+open ContinuousMap
+
+-- Semi Simply connected: 
+def inc_path (X: Type _) [TopologicalSpace X] 
+         (U: Set X) (x: U) (p : Path (x:U) (x:U)): Path (x:X) (x:X) where
+      toFun _t := ((p.toFun _t) : X)
+      continuous_toFun := p.continuous_toFun  
+      source' := x:X
+      target' := x:X
 
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 -- ⟨ x, h ⟩ 
@@ -62,13 +70,7 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop := x ∈ U ∧ x ∈ U 
 
 
--- Semi Simply connected: 
--- def inc_path (X: Type _) [TopologicalSpace X] 
---          (U: Set X) (U ⊂ X) (X ∈ U) (p : Path  x:U x:U): Path (x:X)(x:X) where
---       toFun := toFun p
---       continuous_toFun := (some composition lemma)
---       source' := x:X
---       target' := x:X
+
 -- Condition becomes  ∀ p : Path (x:U) (x:U), Homotopic (inc_path p) (refl x)
 
 -- TODO:
@@ -146,16 +148,3 @@ instance (X : Type _)[TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space 
   generateFrom(lifts_of_slsc_pc_nbhds X)
 
 
-
-
-
-def coverSet :=
-  Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
-
-
-
-
-#exit
-
-
-Sigma 
