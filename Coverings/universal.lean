@@ -58,17 +58,17 @@ open ContinuousMap
 
 -- Semi Simply connected: 
 def inc_path {X: Type _} [TopologicalSpace X] 
-         (U: Set X) (x y: U) (p : Path (x:U) (y:U)): Path (x:X) (y:X) where
-      toFun _t := ((p.toFun _t) : X)
-      continuous_toFun := p.continuous_toFun 
-      source' := x : X
-      target' := y : X
+         (U: Set X) (x y: U) (p : Path x y): Path (x:X) (y:X) where
+      toFun t := p t
+      continuous_toFun := by continuity --p.continuous_toFun  
+      source' := by simp
+      target' := by simp
 
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 -- ⟨ x, h ⟩ 
 
-def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop := x ∈ U ∧ ∀ p :( Path (x:U) (x:U)), Homotopic (inc_path p) (refl x) 
-
+def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop :=
+  ∃ (hx : x ∈ U), ∀ p : Path (X := U) ⟨x, hx⟩ ⟨x, hx⟩, Path.Homotopic (inc_path _ _ _ p) (Path.refl _) 
 
 
 -- Condition becomes  
