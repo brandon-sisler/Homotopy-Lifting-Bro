@@ -47,19 +47,31 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 
 
 
---Definition of local path connectedness
---(From Topology.PathConnected)
+
 
 -- class lpc_space {X: Type _} [TopologicalSpace X] where
 --   lpc_cond: ∀ x : X, ∀ U ∈ (nhds x).sets ∧ IsPathConnected U, ∃ V : 𝓝 x, IsPathConnected v
 
 
 -- ∀ \gamma : Path x x , 
+open ContinuousMap
+
+-- Semi Simply connected: 
+def inc_path (X: Type _) [TopologicalSpace X] 
+         (U: Set X) (x: U) (p : Path (x:U) (x:U)): Path (x:X) (x:X) where
+      toFun _t := ((p.toFun _t) : X)
+      continuous_toFun := p.continuous_toFun  
+      source' := x:X
+      target' := x:X
 
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 -- ⟨ x, h ⟩ 
 
 def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop := x ∈ U ∧ x ∈ U 
+
+
+
+-- Condition becomes  ∀ p : Path (x:U) (x:U), Homotopic (inc_path p) (refl x)
 
 -- TODO:
 -- 1. Tell Lean U is a subspace of X
@@ -97,10 +109,17 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
   . intro a U ainU openU
     rcases slsc_space.slsc_nbhd_exists a with ⟨ W , ⟨openW, ⟨ ainW , slsc_condition ⟩ ⟩ ⟩ 
     
-    have OpenUW : IsOpen (U ∩ W):= TopologicalSpace.isOpen_inter U W openU openW
+    have openUW : IsOpen (U ∩ W):= TopologicalSpace.isOpen_inter U W openU openW
     have slscUW : slsc_subspace a (U ∩ W):= by sorry
     have ainUW : a ∈ U ∩ W := ⟨ ainU , ainW ⟩ 
-    
+    have UW_in : (U ∩ W) ∈ 𝓝 a := openUW.mem_nhds ainUW
+    rcases(path_connected_basis a).mem_iff.mp UW_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U ∩ W⟩
+    have slscV : slsc_subspace a V:= by sorry
+    use V
+    constructor 
+    . sorry
+
+    . exact ⟨ V_in , hVU.1 ⟩ 
     --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
     --rcases(path_connected_basis a).mem_iff.mp U_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U⟩
 
@@ -135,13 +154,5 @@ lemma lifts_of_slsc_pc_nbhds_is_basis {X: Type _} [TopologicalSpace X] [lpc: Loc
 instance (X : Type _)[TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space X] (x₀: X) : 
   TopologicalSpace (UniversalCover X x₀) where
   generateFrom(lifts_of_slsc_pc_nbhds X)
-
-
-
-
-
-
-
-
 
 
