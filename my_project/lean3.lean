@@ -66,7 +66,46 @@ theorem is_open_inter_of_coe_preim (hs : IsOpen s)
 #check is_open_inter_of_coe_preim 
 #check continuous_inclusion
 #check isOpen_iff_forall_mem_open
+
+
+
 lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
+    (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by 
+
+    rw[isOpen_iff_forall_mem_open] 
+    intro x 
+    specialize hA x 
+    intro xA 
+    rcases hA with ⟨ U, UNx, W, Wopen,hW⟩
+    have hW1: W ∩ U = A ∩ U := by
+      rw[← Subtype.preimage_val_eq_preimage_val_iff]
+      exact hW
+    have UNx':∃ V, V ⊆ U ∧ IsOpen V ∧ x ∈ V := by
+      rw [← mem_nhds_iff]
+      exact UNx
+    rcases UNx' with ⟨V,VU,Vopen,xV⟩ 
+    use W ∩ V
+    constructor
+    rintro v ⟨ vW,vV⟩
+    apply Set.inter_subset_left A U  
+    rw [← hW1]
+    constructor
+    exact vW
+    apply VU
+    exact vV
+    constructor
+    exact IsOpen.inter Wopen Vopen
+    constructor
+    apply Set.inter_subset_left W U
+    rw [hW1]
+    constructor
+    exact xA
+    apply VU
+    exact xV
+    exact xV
+
+
+/-lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
     (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by 
 
     rw[isOpen_iff_forall_mem_open] 
@@ -82,6 +121,8 @@ lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
 -- is_open_iff_forall_mem_open.mpr (λ x hx, let ⟨U, hU1, hU2⟩ := hA x,
 --     ⟨V, hV1, hV2, hV3⟩ := mem_nhds_iff.mp hU1 in ⟨A ∩ V, set.inter_subset_left A V,
 --     is_open_inter_of_coe_preim V A hV2 ((continuous_inclusion hV1).is_open_preimage _ hU2), hx, hV3⟩)
+
+-/
 
 lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
 (hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), IsClosed ((Subtype.val : U → Y) ⁻¹' A)) : IsClosed A := by 
