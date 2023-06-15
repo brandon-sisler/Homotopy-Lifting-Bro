@@ -254,10 +254,32 @@ of covering and U_y := F^{-1}(V_y)) -/
           apply W
           exact Subtype.mem u
         exact that
+
+      exact some
+
+      rw [TrivN.mem_source]
+      have :f (H₂ u) ∈ TrivN.baseSet ↔ H₂ u ∈ f⁻¹' TrivN.baseSet:= by exact Set.mem_def 
+      rw [this]
+      have W : ∀ u ∈ U_y , (f ∘ H₂) u ∈ TrivN.baseSet := by 
+        intro u
+        intro Q
+        show u ∈ (f ∘ H₂)⁻¹' (TrivN.baseSet)  
+        sorry
+        --exact Q
+      have some :H₂ u ∈ f⁻¹' TrivN.baseSet := by
+        show f (H₂ u) ∈ TrivN.baseSet
+        --rw [G31]
+        have that : (f ∘ H₂) u ∈ TrivN.baseSet := by
+          specialize W u
+          apply W
+          exact Subtype.mem u
+        exact that
+      
       exact some
       
-      sorry
 
+      
+      have th11:= TrivN.proj_toFun (H₂ u)
       ext
       have H1 : (TrivN.toLocalHomeomorph (H₁ u)).fst= f (H₁ u):= by 
         apply Iff.mpr Prod.fst_eq_iff
