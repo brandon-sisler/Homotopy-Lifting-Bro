@@ -146,11 +146,9 @@ theorem uniqueness_of_homotopy_lifting (Y : Type _) [TopologicalSpace Y] (hf : I
 clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
 of covering and U_y := F^{-1}(V_y)) -/
 
-  have fCont: Continuous f:= by
-    exact IsCoveringMap.continuous hf 
+  have fCont: Continuous f:= IsCoveringMap.continuous hf 
 
-  have H1cont: Continuous H₁:= by
-    exact ContinuousMap.continuous H₁ 
+  have H₁Cont: Continuous H₁:= ContinuousMap.continuous H₁ 
 
   have ClopenS : IsClopen S := by
     apply is_clopen_of_is_clopen_coe
@@ -162,7 +160,7 @@ of covering and U_y := F^{-1}(V_y)) -/
       rw [IsOpen.mem_nhds_iff]
       exact xTrivN
       apply  Continuous.isOpen_preimage 
-      exact Continuous.comp fCont H1cont
+      exact Continuous.comp fCont H₁Cont
       exact TrivN.open_baseSet
     use this
     dsimp only [Set.preimage_setOf_eq]
@@ -210,10 +208,10 @@ by Lemma 2 -/
 
 
 
-example (Y:Type _) [TopologicalSpace Y] (V U:Set Y) (h:IsOpen ((Subtype.val : U → Y) ⁻¹' V )):False := by
-  rcases h with ⟨W,hW, hW1 ⟩ 
-  sorry
+example (Y:Type _) [TopologicalSpace Y] (V U:Set Y): (IsOpen ((Subtype.val : U → Y) ⁻¹' Set.univ )) := by
+  simp
 
+  
 
 
 
