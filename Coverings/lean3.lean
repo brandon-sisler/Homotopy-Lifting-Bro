@@ -278,7 +278,7 @@ of covering and U_y := F^{-1}(V_y)) -/
       exact some
       
 
-      
+
       have th11:= TrivN.proj_toFun (H₂ u)
       ext
       have H1 : (TrivN.toLocalHomeomorph (H₁ u)).fst= f (H₁ u):= by 
@@ -303,7 +303,7 @@ of covering and U_y := F^{-1}(V_y)) -/
     sorry       
     apply Continuous.snd
 
-
+    
 
       
     sorry
