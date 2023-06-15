@@ -237,6 +237,11 @@ of covering and U_y := F^{-1}(V_y)) -/
         rw [G32]
         rw [h]
       apply t.injOn 
+      rw [t.mem_source]
+      have :f (H₁ u) ∈ t.baseSet ↔ H₁ u ∈ f⁻¹' t.baseSet:= by exact Set.mem_def 
+      rw [this]
+      have some :H₁ u ∈ f⁻¹' t.baseSet ↔ true:= 
+      sorry
       sorry
       sorry
       ext
@@ -259,7 +264,8 @@ of covering and U_y := F^{-1}(V_y)) -/
     simp_rw [key]
     apply clopen_equalizer_of_discrete
     apply Continuous.snd 
-    library_search        
+    sorry         
+
 
 
 
@@ -268,8 +274,17 @@ of covering and U_y := F^{-1}(V_y)) -/
 
 --IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
 
-
-  sorry
+  have Hyp : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S := by
+    exact hC
+  have SisUniv : S = Set.univ := by 
+    apply clopen_set_intersect_connected_components_whole_set 
+    exact ClopenS 
+    exact Hyp 
+  ext z
+  have K : z ∈ S := by  
+    rw [SisUniv]
+    exact trivial 
+  exact K 
    
 
 
