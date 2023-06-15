@@ -27,17 +27,17 @@ theorem existence_of_homotopy_lifting
   (p: Xt → X)
   -- (Cp: Continuous p)
   (hp: IsCoveringMap p)
-  (F: I → Y → X)
+  (F: ℝ → Y → X)
   (CF : Continuous (uncurry F)) -- uncurry F: ℝ × Y → X  
   (F0t: Y → Xt)
   (CF0t: Continuous F0t) 
   (hF0tp : F 0 = p ∘ F0t) : 
-  ∃ Ft : I → Y → Xt, Continuous (uncurry Ft) ∧ ∀ t, p ∘ (Ft t) = F t ∧
+  ∃ Ft : ℝ → Y → Xt, Continuous (uncurry Ft) ∧ ∀ t, p ∘ (Ft t) = F t ∧
   Ft 0 = F0t := by
-  have q : (∀ y: Y, ∀ t: I, 
-  (∃ (U: Set Y) (ab: I × I), (IsOpen U ∧ y ∈ U)  ∧  ab.1 < t ∧ t < ab.2 )) := by
+  have q : (∀ y: Y, ∀ t ∈ I, 
+  (∃ U : Set Y, ∃ a, ∃ b, (IsOpen U ∧ y ∈ U)  ∧  a < t ∧ t < b)) := by
     --unfold IsCoveringMap at hp
-    intro y t
+    intro y t t_in
     let x := F t y
     specialize hp x
     have ⟨hp1, hp2, hp3⟩ := hp
@@ -52,66 +52,61 @@ theorem existence_of_homotopy_lifting
     have ⟨A,B,A_is_open,B_is_open,t_in_A,y_in_B,hU⟩ := U_is_open
     have ab := IsOpen.mem_nhds A_is_open t_in_A
     rw [mem_nhds_iff_exists_Ioo_subset] at ab
-    have ⟨a,b,t_in_ab,ab_in_A⟩ := ab
-    clear ab
-    clear ab
-    use B
-    use (a,b)
+    rcases ab with ⟨a,b,t_in_ab,ab_in_A⟩
+    use B, a, b
     constructor
     exact ⟨B_is_open, y_in_B⟩
     simp
     unfold Set.Ioo at t_in_ab
     simp at t_in_ab
     exact t_in_ab
-  choose! U ab hU hab using q
+  choose! U a b hU ha hb using q
   have q : (∀ y: Y, true) := by
     intro y
-    let box : (Y → I → Set (Y × I)) := fun y t => Set.prod (U y t) (Set.Ioo (ab y t).1 (ab y t).2)
-    let opencover := ⋃ (t: I), box y t
-    have hcover: Set.prod {y} (univ) ⊆ opencover := by
-      intro ⟨k1,k2⟩
-      intro h
-      unfold Set.prod at h
-      simp at h
-      rw [Set.mem_iUnion]
-      use k2
-      simp
+    let box : (Y → ℝ → Set (Y × ℝ)) := fun y t => Set.prod (U y t) (Set.Ioo (a y t) (b y t))
+    let opencover := ⋃ (t ∈ I), box y t
+    have hcover: Set.prod {y} (Set.Icc (0:ℝ) 1) ⊆ opencover := by
+      rintro ⟨k1 ,t⟩ ⟨hk1, ht : t ∈ _⟩
+      rw [(mem_singleton_iff.mp hk1 : k1 = y)]; clear hk1 k1
+      
+      rw [Set.mem_iUnion₂]
+      use t, ht
       constructor
-      simp
-      rw [h]
-      exact (hU y k2).2
-      exact (hab y k2)
-    have hopen : ∀ (t: I), IsOpen (box y t) := by
+      exact (hU y t ht).2
+      exact ⟨ha y t ht, hb y t ht⟩
+    have hopen : ∀ t, IsOpen (box y t) := by
       intro t
       simp
       rw [isOpen_prod_iff]
-      intro a b
+      intro y' t'
       intro h
       unfold Set.prod at h
       simp at h
       use U y t
-      use (Ioo (ab y t).fst (ab y t).snd)
+      use (Ioo (a y t) (b y t))
       constructor
-      exact (hU y t).1
-      constructor
-      exact isOpen_Ioo
-      constructor
-      exact h.1
-      constructor
-      unfold Ioo
-      simp
-      exact ⟨h.2.1, h.2.2⟩
-      intro qq hq
-      unfold Set.prod
-      simp
-      constructor
-      exact hq.1
-      exact hq.2
-    have I_is_compact : IsCompact ({y} ×ˢ (univ : Set I)) := by
-      exact isCompact_singleton.prod isCompact_univ
-    have ⟨J, qJ⟩ := I_is_compact.elim_finite_subcover (box y) hopen hcover
-    --have := IsCompact.elim_finite_subcover_image
+      -- exact (hU y t).1
+      -- constructor
+      -- exact isOpen_Ioo
+      -- constructor
+      -- exact h.1
+      -- constructor
+      -- unfold Ioo
+      -- simp
+      -- exact ⟨h.2.1, h.2.2⟩
+      -- intro qq hq
+      -- unfold Set.prod
+      -- simp
+      -- constructor
+      -- exact hq.1
+      -- exact hq.2
+      sorry
+    have I_is_compact : IsCompact (prod {y} (Icc (0:ℝ) 1)) := by
+      exact isCompact_singleton.prod isCompact_Icc
+    have := box y
+    have := IsCompact.elim_finite_subcover I_is_compact (box y) hopen hcover
     
+
     sorry
   sorry
 
@@ -138,13 +133,3 @@ theorem existence_of_homotopy_lifting
 
    ∃ (t : finset ι), s ⊆ ⋃ (i : ι) (H : i ∈ t), U i
    -/
-
--- Induction
-def fib : ℕ → ℕ
-  | 0 => 0
-  | 1 => 1
-  | n+2 => fib n + fib (n+1)
-
-#eval fib 10
-#reduce fib 100
--- Automation
