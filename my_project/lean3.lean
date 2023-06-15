@@ -208,9 +208,11 @@ of covering and U_y := F^{-1}(V_y)) -/
     apply is_clopen_of_is_clopen_coe
     intro y
     specialize hf (f (H₁ y))
+    have t:= (hf ).toTrivialization
     rcases hf with ⟨DT,TrivN,xTrivN ⟩   --- x=f(H₁ y)
-    use ((f∘ H₁)⁻¹' TrivN.baseSet)  
-    have : ((f∘ H₁)⁻¹' TrivN.baseSet)∈ 𝓝 y:= by
+    let U_y := ((f∘ H₁)⁻¹' TrivN.baseSet)
+    use  U_y 
+    have : U_y∈ 𝓝 y:= by
       rw [IsOpen.mem_nhds_iff]
       exact xTrivN
       apply  Continuous.isOpen_preimage 
@@ -218,9 +220,37 @@ of covering and U_y := F^{-1}(V_y)) -/
       exact TrivN.open_baseSet
     use this
     dsimp only [Set.preimage_setOf_eq]
-    show IsClopen {w : (f∘ H₁)⁻¹' TrivN.baseSet | H₁ w = H₂ w}
-    
-    have localTrivN:=(TrivN.preimageHomeomorph (Eq.subset rfl)).toFun
+    --show IsClopen {w : (f∘ H₁)⁻¹' TrivN.baseSet | H₁ w = H₂ w}
+    --have localTrivN:=(TrivN.preimageHomeomorph (Eq.subset rfl))
+    --have localTrivNto := localTrivN.toFun
+    have key: ∀ u:U_y, H₁ u=H₂ u ↔ (t (H₁ u)).2=(t (H₂ u)).2:= by
+      intro u
+      constructor
+      intro G1
+      exact congrArg Prod.snd (congrArg (↑t) G1)
+      intro G2
+      have G31 : f (H₁ u)=(f∘  H₁) u:= by exact rfl
+      have G32 : f (H₂  u)=(f∘  H₂ ) u:= by exact rfl
+      have G4 : f (H₁ u) = f (H₂ u) := by
+        rw [G31]
+        rw [G32]
+        rw [h]
+      apply t.injOn 
+      sorry
+      sorry
+      ext
+      have h1 : (t.toLocalHomeomorph (H₁ u)).fst= f (H₁ u):= by 
+        apply Iff.mpr Prod.fst_eq_iff
+        ext
+        simp
+        sorry
+        
+        sorry 
+      exact congrArg Subtype.val G2
+
+      
+                  
+
 
 
       
