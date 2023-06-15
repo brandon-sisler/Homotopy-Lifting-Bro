@@ -103,7 +103,11 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     
     --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
     --rcases(path_connected_basis a).mem_iff.mp U_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U⟩
+
+def pointed_slsc_pc_nbhds (X : Type _)[TopologicalSpace X] : Set ( Set X) Set X :=
     
+
+-- The universal cover is defined to be the quotient of     
 def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
   Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
 
@@ -111,19 +115,21 @@ def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
 
 def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X): Set (Set ( UniversalCover X x₀ )) :=
   -- Need to take the slsc_pc_nbhds and turn them into a collection of sets insize of UniversalCover 
-  -- (B : slsc_pc_nbhds X)
-  sorry
-  
-instance (X : Type _) [TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space X] (x₀: X): 
-    TopologicalSpace (UniversalCover X x₀) where
-  IsOpen := 
-  -- Would like to define the topology to be everything generated from the sets in 
-  -- lifts_of_slsc_pc_nbhds
-  -- Can we use generateFrom(lifts_of_slsc_pc_nbhds X) ?
+  -- Need to choose a point in each U 
+  Σ U : slsc_pc_nbhds X , {Ugamma : Set UniversalCover X x₀ |  γ : Path}
 
-  isOpen_univ := _
-  isOpen_inter := _
-  isOpen_sUnion := _
+lemma lifts_of_slsc_pc_nbhds_is_basis {X: Type _} [TopologicalSpace X] [lpc: LocPathConnectedSpace X] [slsc: slsc_space X] (x₀ : X) (Y : UniversalCover X x₀) :
+  IsTopologicalBasis ( lifts_of_slsc_pc_nbhds X x₀ ) := by 
+  apply isTopologicalBasis_of_open_of_nhds
+--     sorry
+--   sorry  
+
+instance (X : Type _)[TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space X] (x₀: X) : 
+  TopologicalSpace (UniversalCover X x₀) where
+  generateFrom(lifts_of_slsc_pc_nbhds X)
+
+
+
 
 
 
