@@ -237,6 +237,11 @@ of covering and U_y := F^{-1}(V_y)) -/
         rw [G32]
         rw [h]
       apply t.injOn 
+      rw [t.mem_source]
+      have :f (H₁ u) ∈ t.baseSet ↔ H₁ u ∈ f⁻¹' t.baseSet:= by exact Set.mem_def 
+      rw [this]
+      have some :H₁ u ∈ f⁻¹' t.baseSet ↔ true:= 
+      sorry
       sorry
       sorry
       ext
@@ -259,7 +264,8 @@ of covering and U_y := F^{-1}(V_y)) -/
     simp_rw [key]
     apply clopen_equalizer_of_discrete
     apply Continuous.snd 
-    library_search        
+    sorry         
+
 
 
 
