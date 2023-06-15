@@ -20,8 +20,11 @@ noncomputable def toHomeomorph (hf : IsCoveringMap f)
   Homeomorph.homeomorphOfContinuousOpen (Equiv.ofBijective f h ) (IsCoveringMap.continuous hf) (IsCoveringMap.isOpenMap hf)
 
 -- homeomorph.homeomorph_of_continuous_open (equiv.of_bijective f h) hf.continuous hf.is_open_map
-lemma is_locally_constant_card (hf : IsCoveringMap f) :
-  IsLocallyConstant (fun x => #(f ⁻¹' {x})) := by sorry
+
+#check IsLocallyConstant.iff_exists_open
+
+--lemma is_locally_constant_card (hf : IsCoveringMap f) :
+--  IsLocallyConstant (fun x => #(f ⁻¹' {x})) := by sorry 
 -- (is_locally_constant.iff_exists_open _).2 $ λ x, let ⟨t, ht⟩ := (hf x).2 in
 --   ⟨_, t.open_base_set, ht, λ y hy, (t.preimage_singleton_homeomorph hy).to_equiv.cardinal_eq⟩
 
@@ -43,24 +46,122 @@ lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [Topologic
   have x_in_con : x ∈ connectedComponent x := mem_connectedComponent 
   exact con_sub x_in_con 
 
-#check Inducing.isOpen_iff
-#check Subtype.preimage_val_eq_preimage_val_iff
 
-theorem is_open_inter_of_coe_preim' (hs : IsOpen s)
-  (h : IsOpen ((Subtype.val : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by  sorry
--- let ⟨a, b, c⟩ := inducing_coe.is_open_iff.mp h in
---   subtype.preimage_coe_eq_preimage_coe_iff.mp c ▸ b.inter hs
+theorem is_open_inter_of_coe_preim (hs : IsOpen s)
+  (h : IsOpen ((Subtype.val : s → X) ⁻¹' t)) : IsOpen (t ∩ s) := by 
+
+  rw[Inducing.isOpen_iff inducing_subtype_val] at h 
+  cases' h with m H
+  cases' H with hleft hright
+  have inter : t ∩ s = m ∩ s := by
+    rw[←Subtype.preimage_val_eq_preimage_val_iff]
+    symm 
+    exact hright 
+  rw[inter] 
+  exact IsOpen.inter hleft hs
+
+#check mem_nhds_iff
+#check Set.inter_subset_left
+#check IsOpen.preimage
+#check is_open_inter_of_coe_preim 
+#check continuous_inclusion
+#check isOpen_iff_forall_mem_open
+
+
 
 lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
-    (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by
-  sorry
+    (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by 
+
+    rw[isOpen_iff_forall_mem_open] 
+    intro x 
+    specialize hA x 
+    intro xA 
+    rcases hA with ⟨ U, UNx, W, Wopen,hW⟩
+    have hW1: W ∩ U = A ∩ U := by
+      rw[← Subtype.preimage_val_eq_preimage_val_iff]
+      exact hW
+    have UNx':∃ V, V ⊆ U ∧ IsOpen V ∧ x ∈ V := by
+      rw [← mem_nhds_iff]
+      exact UNx
+    rcases UNx' with ⟨V,VU,Vopen,xV⟩ 
+    use W ∩ V
+    constructor
+    rintro v ⟨ vW,vV⟩
+    apply Set.inter_subset_left A U  
+    rw [← hW1]
+    constructor
+    exact vW
+    apply VU
+    exact vV
+    constructor
+    exact IsOpen.inter Wopen Vopen
+    constructor
+    apply Set.inter_subset_left W U
+    rw [hW1]
+    constructor
+    exact xA
+    apply VU
+    exact xV
+    exact xV
+
+
+/-lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
+    (hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by 
+
+    rw[isOpen_iff_forall_mem_open] 
+    intro x hx
+    specialize hA x
+    rcases hA with ⟨V, ⟨hV1, ⟨hV2,hV3⟩⟩ ⟩ 
+    have : A ∩ V ⊆ A := by 
+      apply Set.inter_subset_left
+    use A ∩ V 
+    constructor 
+    exact this 
+    sorry
+-- is_open_iff_forall_mem_open.mpr (λ x hx, let ⟨U, hU1, hU2⟩ := hA x,
+--     ⟨V, hV1, hV2, hV3⟩ := mem_nhds_iff.mp hU1 in ⟨A ∩ V, set.inter_subset_left A V,
+--     is_open_inter_of_coe_preim V A hV2 ((continuous_inclusion hV1).is_open_preimage _ hU2), hx, hV3⟩)
+
+-/
 
 lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
-(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClosed ((Subtype.val : U → Y) ⁻¹' A)) : IsClosed A := by sorry
+(hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), IsClosed ((Subtype.val : U → Y) ⁻¹' A)) : IsClosed A := by 
+  rw [← isOpen_compl_iff]
+  apply is_open_of_is_open_coe 
+  intro x 
+  specialize hA x 
+  cases' hA with hleft hright 
+  cases' hright with h1 h2 
+  use hleft 
+  use h1 
+  dsimp at h2 
+  dsimp 
+  rw [isOpen_compl_iff]
+  exact h2   
 
 lemma is_clopen_of_is_clopen_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
-(hA : ∀ x : Y, ∃ (U : Set Y) (hU : U ∈ 𝓝 x), IsClopen ((Subtype.val : U → Y) ⁻¹' A)) : IsClopen A := by sorry 
+(hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), IsClopen ((Subtype.val : U → Y) ⁻¹' A)) : IsClopen A := by
+  have left : IsOpen A := by
+    apply is_open_of_is_open_coe Y A 
+    intro x 
+    specialize hA x 
+    cases' hA with hleft hright
+    use hleft 
+    cases' hright with hleft hright
+    use hleft 
+    exact hright.1 
 
+  have right : IsClosed A := by
+    apply is_closed_of_is_closed_coe Y A 
+    intro x 
+    specialize hA x 
+    cases' hA with hleft hright
+    use hleft 
+    cases' hright with hleft hright
+    use hleft 
+    exact hright.2 
+
+  exact ⟨left, right ⟩ 
 
 theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
   [DiscreteTopology Y] {h g : X → Y} (hf : Continuous h) (hg : Continuous g) :
@@ -76,7 +177,10 @@ theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
     apply IsClopen.preimage
     exact diag_cl
     exact con_map
-  have re : (fun x => (g x, h x)) ⁻¹' Set.diagonal Y = {x |h x = g x} := by sorry
+  have re : (fun x => (g x, h x)) ⁻¹' Set.diagonal Y = {x |h x = g x} := by 
+    ext n  
+    simp
+    tauto 
   rw[←re]
   exact this
 
@@ -85,7 +189,94 @@ lemma tautology : true := rfl
 theorem uniqueness_of_homotopy_lifting (Y : Type _) [TopologicalSpace Y] (hf : IsCoveringMap f)
   (H₁ H₂ : ContinuousMap Y E) (h : f ∘ H₁ = f ∘ H₂)
   (hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) :
-  H₁ = H₂ := by sorry 
+  H₁ = H₂ := by 
+
+
+/- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
+  let S:= {y:Y | H₁ y = H₂ y}
+  
+
+/- S is clopen proof Part 1 : by Lemma 1 it suffices to prove that U_y ∩ S is
+clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
+of covering and U_y := F^{-1}(V_y)) -/
+
+  have fCont: Continuous f:= IsCoveringMap.continuous hf 
+
+  have H₁Cont: Continuous H₁:= ContinuousMap.continuous H₁ 
+
+  have ClopenS : IsClopen S := by
+    apply is_clopen_of_is_clopen_coe
+    intro y
+    specialize hf (f (H₁ y))
+    rcases hf with ⟨DT,TrivN,xTrivN ⟩   --- x=f(H₁ y)
+    use ((f∘ H₁)⁻¹' TrivN.baseSet)  
+    have : ((f∘ H₁)⁻¹' TrivN.baseSet)∈ 𝓝 y:= by
+      rw [IsOpen.mem_nhds_iff]
+      exact xTrivN
+      apply  Continuous.isOpen_preimage 
+      exact Continuous.comp fCont H₁Cont
+      exact TrivN.open_baseSet
+    use this
+    dsimp only [Set.preimage_setOf_eq]
+    show IsClopen {w : (f∘ H₁)⁻¹' TrivN.baseSet | H₁ w = H₂ w}
+    
+    have localTrivN:=(TrivN.preimageHomeomorph (Eq.subset rfl)).toFun
+
+
+      
+    sorry
+
+--IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
+
+
+sorry
+   
+
+
+
+/- S is clopen proof Part 2(a) : U_y ∩ S = {z ∈ U_y ∣ H₁(z) = H₂(z)} -/
+
+
+
+/- S is clopen proof Part 2(b) : ∃ discrete topological space D such that 
+f⁻¹(V_y) ≅ V_y × D := by defn of covering -/
+
+
+
+/- S is clopen proof Part 2(c) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} is clopen in U_y := 
+by Lemma 2 -/
+
+
+
+/- S is clopen proof Part 2(d) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} 
+= {z ∈ U_y ∣ H₁(z) = H₂(z)} and {z ∈ U_y ∣ H₁(z) = H₂(z)} clopen by 2(c) and 
+ -/
+
+
+
+/- S is clopen proof Part 2(e) : S is clopen by Part 1 and Part 2(a) -/
+
+
+
+/- Proof that S = Y using Lemma 3 -/
+
+
+
+example (Y:Type _) [TopologicalSpace Y] (V U:Set Y): (IsOpen ((Subtype.val : U → Y) ⁻¹' Set.univ )) := by
+  simp
+
+  
+
+
+
+
+
+
+
+
+
+
+
 
 -- begin
 --   refine fun_like.ext H₁ H₂ (set.eq_univ_iff_forall.mp
