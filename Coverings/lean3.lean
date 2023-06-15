@@ -224,11 +224,12 @@ of covering and U_y := F^{-1}(V_y)) -/
     --show IsClopen {w : (f∘ H₁)⁻¹' TrivN.baseSet | H₁ w = H₂ w}
     --have localTrivN:=(TrivN.preimageHomeomorph (Eq.subset rfl))
     --have localTrivNto := localTrivN.toFun
-    have key: ∀ u:U_y, H₁ u=H₂ u ↔ (t (H₁ u)).2=(t (H₂ u)).2:= by
+    have key: ∀ u:U_y, H₁ u=H₂ u ↔ (TrivN (H₁ u)).2=(TrivN (H₂ u)).2:= by
       intro u
       constructor
       intro G1
-      exact congrArg Prod.snd (congrArg (↑t) G1)
+      exact congrArg Prod.snd (congrArg (↑TrivN) G1)
+      --exact congrArg Prod.snd (congrArg (↑t) G1)
       intro G2
       have G31 : f (H₁ u)=(f∘  H₁) u:= by exact rfl
       have G32 : f (H₂  u)=(f∘  H₂ ) u:= by exact rfl
@@ -256,16 +257,15 @@ of covering and U_y := F^{-1}(V_y)) -/
       exact some
       
       sorry
-      sorry
 
-      /- ext
-      have H1 : (t.toLocalHomeomorph (H₁ u)).fst= f (H₁ u):= by 
+      ext
+      have H1 : (TrivN.toLocalHomeomorph (H₁ u)).fst= f (H₁ u):= by 
         apply Iff.mpr Prod.fst_eq_iff
         ext
         simp
         sorry
         simp 
-      have H2 : (t.toLocalHomeomorph (H₂ u)).fst= f (H₂ u):= by 
+      have H2 : (TrivN.toLocalHomeomorph (H₂ u)).fst= f (H₂ u):= by 
         apply Iff.mpr Prod.fst_eq_iff
         ext
         simp
@@ -278,14 +278,14 @@ of covering and U_y := F^{-1}(V_y)) -/
     simp_rw [key]
     apply clopen_equalizer_of_discrete
     apply Continuous.snd 
-    sorry      -/   
-
+    sorry       
+    apply Continuous.snd
 
 
 
       
     sorry
-
+    
 --IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
 
   have Hyp : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S := by
