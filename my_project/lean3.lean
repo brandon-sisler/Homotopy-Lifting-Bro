@@ -158,25 +158,26 @@ of covering and U_y := F^{-1}(V_y)) -/
     specialize hf (f (H₁ y))
     rcases hf with ⟨DT,TrivN,xTrivN ⟩   --- x=f(H₁ y)
     use ((f∘ H₁)⁻¹' TrivN.baseSet)  
-    have h1: ((f∘ H₁)⁻¹' TrivN.baseSet)∈ 𝓝 y:= by
+    have : ((f∘ H₁)⁻¹' TrivN.baseSet)∈ 𝓝 y:= by
       rw [IsOpen.mem_nhds_iff]
       exact xTrivN
       apply  Continuous.isOpen_preimage 
       exact Continuous.comp fCont H1cont
       exact TrivN.open_baseSet
-    use h1
-    simp only [Set.preimage_setOf_eq]
-    let compH2:=  Prod.fst ∘  TrivN.toFun ∘ H₁
+    use this
+    dsimp only [Set.preimage_setOf_eq]
+    show IsClopen {w : (f∘ H₁)⁻¹' TrivN.baseSet | H₁ w = H₂ w}
     
+    have localTrivN:=(TrivN.preimageHomeomorph (Eq.subset rfl)).toFun
+
 
       
     sorry
-    
 
 --IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
 
 
-   sorry
+sorry
    
 
 
@@ -209,6 +210,9 @@ by Lemma 2 -/
 
 
 
+example (Y:Type _) [TopologicalSpace Y] (V U:Set Y) (h:IsOpen ((Subtype.val : U → Y) ⁻¹' V )):False := by
+  rcases h with ⟨W,hW, hW1 ⟩ 
+  sorry
 
 
 
