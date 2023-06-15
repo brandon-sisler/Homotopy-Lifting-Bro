@@ -223,7 +223,7 @@ of covering and U_y := F^{-1}(V_y)) -/
     dsimp only [Set.preimage_setOf_eq]
     --show IsClopen {w : (f∘ H₁)⁻¹' TrivN.baseSet | H₁ w = H₂ w}
     --have localTrivN:=(TrivN.preimageHomeomorph (Eq.subset rfl))
-    --have localTrivNto := localTrivN.toFun
+    --have localTrivNto := localTrivN.toFun dhduh
     have key: ∀ u:U_y, H₁ u=H₂ u ↔ (TrivN (H₁ u)).2=(TrivN (H₂ u)).2:= by
       intro u
       constructor
@@ -285,7 +285,7 @@ of covering and U_y := F^{-1}(V_y)) -/
 
       
     sorry
-    
+
 --IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
 
   have Hyp : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S := by
