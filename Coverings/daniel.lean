@@ -59,10 +59,14 @@ structure LiftingSituation (hp : IsCoveringMap p) where
 variable {Y}
 variable (hp : IsCoveringMap p) (Φ : hp.LiftingSituation Y)
 
+lemma aux (y : Y) (hy : y ∈ U) : (y, 0) ∈ (U ×ˢ univ) := by
+  apply mk_mem_prod hy
+  apply mem_univ
+
 -- rearrange the data of the theorem `test`
 theorem test2 (y : Y) : 
     ∃ U ∈ 𝓝 y, ∃ Ft : ContinuousMap (U ×ˢ (univ : Set I)) E, 
-    (∀ (y' : Y) (hy' : y' ∈ U), Ft ⟨(y', 0), sorry⟩ = Φ.F₀ y') 
+    (∀ (y' : Y) (hy' : y' ∈ U), Ft ⟨(y', 0), aux y' hy'⟩ = Φ.F₀ y') 
     ∧ ∀ z : U ×ˢ (univ : Set I), Φ.f z = p (Ft z) :=
   sorry 
 
@@ -74,7 +78,7 @@ noncomputable def nhd_lift (y : Y) : ContinuousMap (hp.tube Φ y ×ˢ (univ : Se
   (hp.test2 Φ y).choose_spec.2.choose
 
 lemma extends_F₀ (y : Y) (y' : Y) (hy' : y' ∈ hp.tube Φ y) :
-    hp.nhd_lift Φ y ⟨(y', 0), sorry⟩ = Φ.F₀ y' :=
+    hp.nhd_lift Φ y ⟨(y', 0), aux y' hy'⟩ = Φ.F₀ y' :=
   (hp.test2 Φ y).choose_spec.2.choose_spec.1 y' hy'
 
 lemma is_lift (y : Y) (z : hp.tube Φ y ×ˢ (univ : Set I)) :
