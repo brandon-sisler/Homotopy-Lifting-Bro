@@ -9,6 +9,7 @@ import Mathlib.Topology.LocallyConstant.Basic
 open Cardinal Topology
 
 set_option autoImplicit false
+set_option maxHeartbeats 0
 
 namespace IsCoveringMap
 
@@ -239,17 +240,26 @@ of covering and U_y := F^{-1}(V_y)) -/
       sorry
       sorry
       ext
-      have h1 : (t.toLocalHomeomorph (H₁ u)).fst= f (H₁ u):= by 
+      have H1 : (t.toLocalHomeomorph (H₁ u)).fst= f (H₁ u):= by 
         apply Iff.mpr Prod.fst_eq_iff
         ext
         simp
         sorry
-        
-        sorry 
+        simp 
+      have H2 : (t.toLocalHomeomorph (H₂ u)).fst= f (H₂ u):= by 
+        apply Iff.mpr Prod.fst_eq_iff
+        ext
+        simp
+        sorry
+        simp 
+      rw [H1]
+      rw [H2]
+      exact G4
       exact congrArg Subtype.val G2
-
-      
-                  
+    simp_rw [key]
+    apply clopen_equalizer_of_discrete
+    apply Continuous.snd 
+    library_search        
 
 
 
@@ -259,7 +269,7 @@ of covering and U_y := F^{-1}(V_y)) -/
 --IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
 
 
-sorry
+  sorry
    
 
 
