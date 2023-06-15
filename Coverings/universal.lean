@@ -57,8 +57,8 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 open ContinuousMap
 
 -- Semi Simply connected: 
-def inc_path (X: Type _) [TopologicalSpace X] 
-         (U: Set X) (x: U) (p : Path (x:U) (x:U)): Path (x:X) (x:X) where
+def inc_path {X: Type _} [TopologicalSpace X] 
+         (U: Set X) (x y: U) (p : Path (x:U) (y:U)): Path (x:X) (y:X) where
       toFun _t := ((p.toFun _t) : X)
       continuous_toFun := p.continuous_toFun  
       source' := x:X
@@ -67,11 +67,11 @@ def inc_path (X: Type _) [TopologicalSpace X]
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 -- ⟨ x, h ⟩ 
 
-def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop := x ∈ U ∧ x ∈ U 
+def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop := x ∈ U ∧ ∀ p :( Path (x:U) (x:U)), Homotopic (inc_path p) (refl x) 
 
 
 
--- Condition becomes  ∀ p : Path (x:U) (x:U), Homotopic (inc_path p) (refl x)
+-- Condition becomes  
 
 -- TODO:
 -- 1. Tell Lean U is a subspace of X
