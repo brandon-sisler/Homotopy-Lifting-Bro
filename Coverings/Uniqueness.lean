@@ -1,9 +1,9 @@
 --import Mathlib.Topology.Instances.Real
-import Mathlib.Topology.Homotopy.basic
+import Mathlib.Topology.Homotopy.Basic
 import Mathlib.Topology.IsLocallyHomeomorph
 --import Mathlib.Topology.FiberBundle.basic
-import Mathlib.Topology.LocallyConstant.basic
-import Mathlib.SetTheory.cardinal.basic
+import Mathlib.Topology.LocallyConstant.Basic
+import Mathlib.SetTheory.Cardinal.Basic
 import Mathlib.Topology.Covering
 --import Mathlib.Topology.basic
 
@@ -140,7 +140,7 @@ by Lemma 2 -/
 
 
 
-
+  sorry
 
 
 
