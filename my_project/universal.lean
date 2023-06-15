@@ -61,6 +61,16 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 
 def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop := x ∈ U ∧ x ∈ U 
 
+
+-- Semi Simply connected: 
+-- def inc_path (X: Type _) [TopologicalSpace X] 
+--          (U: Set X) (U ⊂ X) (X ∈ U) (p : Path  x:U x:U): Path (x:X)(x:X) where
+--       toFun := toFun p
+--       continuous_toFun := (some composition lemma)
+--       source' := x:X
+--       target' := x:X
+-- Condition becomes  ∀ p : Path (x:U) (x:U), Homotopic (inc_path p) (refl x)
+
 -- TODO:
 -- 1. Tell Lean U is a subspace of X
 -- 2. indicate i^{-1}(x) : U
@@ -97,16 +107,23 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
   . intro a U ainU openU
     rcases slsc_space.slsc_nbhd_exists a with ⟨ W , ⟨openW, ⟨ ainW , slsc_condition ⟩ ⟩ ⟩ 
     
-    have OpenUW : IsOpen (U ∩ W):= TopologicalSpace.isOpen_inter U W openU openW
+    have openUW : IsOpen (U ∩ W):= TopologicalSpace.isOpen_inter U W openU openW
     have slscUW : slsc_subspace a (U ∩ W):= by sorry
     have ainUW : a ∈ U ∩ W := ⟨ ainU , ainW ⟩ 
-    
+    have UW_in : (U ∩ W) ∈ 𝓝 a := openUW.mem_nhds ainUW
+    rcases(path_connected_basis a).mem_iff.mp UW_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U ∩ W⟩
+    have slscV : slsc_subspace a V:= by sorry
+    use V
+    constructor 
+    . sorry
+
+    . exact ⟨ V_in , hVU.1 ⟩ 
     --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
     --rcases(path_connected_basis a).mem_iff.mp U_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U⟩
-
+    
 def pointed_slsc_pc_nbhds (X : Type _)[TopologicalSpace X] : Set ( Set X) Set X :=
     
-
+  
 -- The universal cover is defined to be the quotient of     
 def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
   Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
@@ -132,8 +149,13 @@ instance (X : Type _)[TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space 
 
 
 
+def coverSet :=
+  Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
 
 
 
 
+#exit
 
+
+Sigma 
