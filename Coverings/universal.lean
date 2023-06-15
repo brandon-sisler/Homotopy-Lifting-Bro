@@ -60,9 +60,9 @@ open ContinuousMap
 def inc_path {X: Type _} [TopologicalSpace X] 
          (U: Set X) (x y: U) (p : Path (x:U) (y:U)): Path (x:X) (y:X) where
       toFun _t := ((p.toFun _t) : X)
-      continuous_toFun := p.continuous_toFun  
-      source' := x:X
-      target' := x:X
+      continuous_toFun := p.continuous_toFun 
+      source' := x : X
+      target' := y : X
 
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 -- ⟨ x, h ⟩ 
@@ -139,14 +139,21 @@ def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
 --          (U: Set X) (x: U) (p : Path (x:U) (x:U)): Path (x:X) (x:X) where
 
 def get_all_local_compositions (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : Set X) ( γ : Path x₀ (get_point U)) : Set ( UniversalCover X x₀ ) := 
-  Σ u : U, { γ₁ : UniversalCover X x₀ | ∃ γ₀ : Path.Homotopic.Quotient (get_point U) u , γ₁ = Quotient.comp γ (inc_path X U u γ₀)}
+  Σ u : U, { γ₁ : UniversalCover X x₀ | ∃ γ₀ : ( Path.Homotopic.Quotient (get_point U) u ) , γ₁ = Quotient.comp γ (inc_path X U u γ₀)}
 
 #check UniversalCover
 
+
+
+-- lifts_of_slsc_pc_nbhds creates a collection of subsets of the universal cover which correspond
+-- to each homotopy equivalence class of paths
 def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X): Set (Set ( UniversalCover X x₀ )) :=
   -- Need to take the slsc_pc_nbhds and turn them into a collection of sets insize of UniversalCover 
   -- Need to choose a point in each U 
+  
+  #check slsc_pc_nbhds X
   Σ U : slsc_pc_nbhds X, Σ γ₀ : Path x₀ (get_point U), get_all_local_compositions X x₀ U γ₀ 
+  
 
 lemma lifts_of_slsc_pc_nbhds_is_basis {X: Type _} [TopologicalSpace X] [lpc: LocPathConnectedSpace X] [slsc: slsc_space X] (x₀ : X) (Y : UniversalCover X x₀) :
   IsTopologicalBasis ( lifts_of_slsc_pc_nbhds X x₀ ) := by 
