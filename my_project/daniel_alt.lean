@@ -36,14 +36,21 @@ Theorems:
 `isCompact_prod` : product of compact sets is compact
 -/
 
-variable {X Y E : Type _}
-variable [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace E]
-variable (f : Y × I → X) (p : E → X) (F₀ : Y → E)
-variable (hf : Continuous f) (hp : IsCoveringMap p)
+open Bundle
+
+#check Bundle.TotalSpace
+
+variable {X Y : Type _} {F : Type _} {E : X → Type _}
+variable [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace F] [DiscreteTopology F]
+  [∀ x : X, TopologicalSpace (E x)] [TopologicalSpace (TotalSpace E)] [FiberBundle F E]
+variable (f : Y × I → X) (F₀ : Y → TotalSpace E)
+variable (hf : Continuous f)
 variable (x : X) (y : Y) (t : I)
 
+local notation "p" => (TotalSpace.proj : TotalSpace E → X)
+
 lemma nbhd_in_trivialization (y : Y) (t : I) :
-  ∃ triv : Trivialization (p ⁻¹' {f (y, t)}) p, ∃ Nyt ∈ 𝓝 (y, t), f '' Nyt ⊆ triv.baseSet := by
+    ∃ triv : Trivialization F p, ∃ Nyt ∈ 𝓝 (y, t), f '' Nyt ⊆ triv.baseSet := by
     -- find the trivialization
     specialize hp <| f (y, t)
     let triv : Trivialization (p ⁻¹' {f (y, t)}) p := by
@@ -64,7 +71,8 @@ lemma nbhd_in_trivialization (y : Y) (t : I) :
 
 lemma lift_from_point (y : Y) (s : Set I) (hso : IsOpen s) (hsc : IsConnected s)
   (triv : Trivialization (p ⁻¹' {f (y, t)}) p) (htriv : f '' ({y} ×ˢ s) ⊆ triv.baseSet)
-  (pt : s) (Fpt : E) : ∃ F : s → E, Continuous F ∧ (F pt = Fpt) := by sorry
+  (pt : s) (Fpt : E) : ∃ F : s → E, Continuous F ∧ (F pt = Fpt) := by
+    
 
 theorem homotopy_lift (hf : Continuous f) (hp : IsCoveringMap p) (hF₀ : Continuous F₀) :
   ∃ F : Y × I → E, Continuous F ∧ p ∘ F = f ∧ (fun y ↦ F (y, 0)) = F₀ := sorry
