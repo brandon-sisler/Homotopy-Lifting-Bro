@@ -104,19 +104,27 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
     --rcases(path_connected_basis a).mem_iff.mp U_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U⟩
 
-def pointed_slsc_pc_nbhds (X : Type _)[TopologicalSpace X] : Set ( Set X) Set X :=
-    
+-- We will use this to get a map that assigns to each non-empty subset of X a point in it
+
+-- curly braces {} it so that one does not need to specify a space
+def getPoint {X : Type _}(U : Set X) : U := 
+ sorry
+
+#check getPoint
 
 -- The universal cover is defined to be the quotient of     
 def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
   Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
+
+def allLocalCompositions (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : Set X) ( γ : Path x₀ (getPoint U)) : Set ( UniversalCover X x₀ ) := 
+  Σ u : U, { γ₁ : UniversalCover X x₀ | ∃ γ₀ : Path.Homotopic.Quotient (getPoint U) u , γ₁ = Quotient.comp γ γ₀}
 
 #check UniversalCover
 
 def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X): Set (Set ( UniversalCover X x₀ )) :=
   -- Need to take the slsc_pc_nbhds and turn them into a collection of sets insize of UniversalCover 
   -- Need to choose a point in each U 
-  Σ U : slsc_pc_nbhds X , {Ugamma : Set UniversalCover X x₀ |  γ : Path}
+  Σ U : slsc_pc_nbhds X, Σ γ₀ : Path x₀ getPoint U, allLocalCompositions γ₀ U 
 
 lemma lifts_of_slsc_pc_nbhds_is_basis {X: Type _} [TopologicalSpace X] [lpc: LocPathConnectedSpace X] [slsc: slsc_space X] (x₀ : X) (Y : UniversalCover X x₀) :
   IsTopologicalBasis ( lifts_of_slsc_pc_nbhds X x₀ ) := by 
