@@ -6,6 +6,7 @@ import Mathlib.Topology.FiberBundle.Basic
 import Mathlib.Topology.Instances.Real
 import Mathlib.SetTheory.Cardinal.Basic 
 import Mathlib.Topology.LocallyConstant.Basic
+import Mathlib.Topology.Constructions
 open Cardinal Topology
 
 set_option autoImplicit false
@@ -373,12 +374,34 @@ of covering and U_y := F^{-1}(V_y)) -/
     simp_rw [key]
     apply clopen_equalizer_of_discrete
     apply Continuous.snd 
-    apply Continuous.comp
-    sorry      
-    sorry
-    apply Continuous.snd
-    sorry
+    
+    have h1: ∀ u : U_y, f (H₁ y)∈ TrivN.baseSet:= by exact fun u => xTrivN
+    have h22: ∀ u : U_y, H₁ ((Subtype.val : U_y → Y) u) ∈ TrivN.source:= by 
+      simp
+      intro var
+      rw[ TrivN.mem_source]
+      simp
 
+    have h2 := TrivN.continuous_toFun.comp_continuous (H₁Cont.comp continuous_subtype_val) h22
+    apply h2
+
+    apply Continuous.snd
+    
+    have h1: ∀ u : U_y, f (H₁ y)∈ TrivN.baseSet:= by exact fun u => xTrivN
+    have h22: ∀ u : U_y, H₂ ((Subtype.val : U_y → Y) u) ∈ TrivN.source:= by 
+      simp
+      intro var
+      rw[ TrivN.mem_source]
+      have FuEq : f (H₁ var) = f (H₂ var) := by
+        calc
+        f (H₁ var)=(f∘  H₁) var:=  rfl
+        _=(f∘ H₂) var:= by rw [h]
+      simp
+      rw [FuEq]
+      simp
+    have h2 := TrivN.continuous_toFun.comp_continuous (H₂Cont.comp continuous_subtype_val) h22
+    apply h2
+    
 --IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
 
   --have Hyp : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S := by

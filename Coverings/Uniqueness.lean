@@ -15,12 +15,6 @@ namespace IsCoveringMap
 
 variable {E X : Type _} [TopologicalSpace E] [TopologicalSpace X] (f : E → X) (s t: Set X)
 
--- If f is a bijective covering map then it is a homeomorphism
-noncomputable def toHomeomorph (hf : IsCoveringMap f)
-(h : Function.Bijective f) : Homeomorph E X := 
-  Homeomorph.homeomorphOfContinuousOpen (Equiv.ofBijective f h ) (IsCoveringMap.continuous hf) (IsCoveringMap.isOpenMap hf)
-
--- homeomorph.homeomorph_of_continuous_open (equiv.of_bijective f h) hf.continuous hf.is_open_map
 
 #check IsLocallyConstant.iff_exists_open
 
@@ -57,9 +51,6 @@ lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [Topologic
   exact con_sub x_in_con 
 
 
-
-
-
 /- 
     Following key theorem states that a set A ⊆ Y is open in Y ↔ for every y ∈ Y 
     there is a nbhd U_y of y such that U_y ∩ A is open in U_y 
@@ -68,9 +59,6 @@ lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [Topologic
 
     Note that this is an if and only if statement
 -/
-
-
-
 
 
 #check mem_nhds_iff
@@ -122,7 +110,7 @@ lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
     Corollary of the above theorem is that a set A ⊆ Y is closed in Y ↔ for every y ∈ Y 
     there is a nbhd U_y of y such that U_y ∩ A is closed in U_y
 
-    Use above theorem for complement of A  
+    Follows by using above theorem for complement of A  
 -/
 
 
@@ -146,7 +134,7 @@ lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
     A direct consequence is that a set A ⊆ Y is clopen in Y ↔ for every y ∈ Y 
     there is a nbhd U_y of y such that U_y ∩ A is clopen in U_y
 
-    Use above theorem for complement of A  
+    Follows as a consequence of the previous two theorems  
 -/
 
 
@@ -175,19 +163,15 @@ lemma is_clopen_of_is_clopen_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
   exact ⟨left, right ⟩ 
 
 
-
-
-
 /- 
  
     Following lemma states that if f, g : X → Y are continuous and Y is a discrete topological
     space, then {x ∈ X ∣ f(x) = g(x)} is clopen in X 
     
     Main idea is to construct the function (f, g) : X → Y × Y.
-    Then {x ∈ X ∣ f(x) = g(x)} is the inverse image of the diagonal in Y × Y
+    Then {x ∈ X ∣ f(x) = g(x)} is the inverse image of the diagonal in Y × Y.
 
 -/
-
 
 
 theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
@@ -212,24 +196,26 @@ theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
   exact this
 
 
-
-
-
-
 --- Statement of the Theorem ---
 
+theorem uniqueness_of_homotopy_lifting (Y : Type _) [TopologicalSpace Y] (hf : IsCoveringMap f)
+  (H₁ H₂ : ContinuousMap Y E) (h : f ∘ H₁ = f ∘ H₂)
+  (hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) :
+  H₁ = H₂ := by 
 
-
-  
 
 /- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
-  
 
-/- S is clopen proof Part 1 : by Lemma 1 it suffices to prove that U_y ∩ S is
-clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
-of covering and U_y := F^{-1}(V_y)) -/
+  let S:= {y:Y | H₁ y = H₂ y}
 
-   
+  have fCont: Continuous f:= IsCoveringMap.continuous hf 
+  have H₁Cont: Continuous H₁:= ContinuousMap.continuous H₁ 
+  have H₂Cont: Continuous H₂:= ContinuousMap.continuous H₂
+
+/- S is clopen proof Part 1 : by Lemma is_clopen_of_is_clopen_coe it suffices 
+to prove that U_y ∩ S is clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly 
+covered nbhd V_y by defn of covering and U_y := F^{-1}(V_y)) -/
+
 
 
 
@@ -261,32 +247,12 @@ by Lemma 2 -/
 
 
 
-
-
-
-
-
-
-
-
-
-theorem uniqueness_of_homotopy_lifting (Y : Type _) [TopologicalSpace Y] (hf : IsCoveringMap f)
-  (H₁ H₂ : ContinuousMap Y E) (h : f ∘ H₁ = f ∘ H₂)
-  (hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) :
-  H₁ = H₂ := by 
-
-
 /- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
-  let S:= {y:Y | H₁ y = H₂ y}
   
 
 /- S is clopen proof Part 1 : by Lemma 1 it suffices to prove that U_y ∩ S is
 clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
 of covering and U_y := F^{-1}(V_y)) -/
-
-  have fCont: Continuous f:= IsCoveringMap.continuous hf 
-  have H₁Cont: Continuous H₁:= ContinuousMap.continuous H₁ 
-  have H₂Cont: Continuous H₂:= ContinuousMap.continuous H₂
 
 
   have ClopenS : IsClopen S := by
@@ -366,8 +332,17 @@ of covering and U_y := F^{-1}(V_y)) -/
     apply Continuous.snd 
     apply Continuous.comp
     sorry      
-    sorry
+    --apply continuous_subtype_coe 
+    rw [continuous_def]
+    intro B hB
+    use H₁⁻¹' B
+    constructor
     
+    --constructor 
+    --constructor
+    sorry
+    simp
+    sorry
     apply Continuous.snd
     apply Continuous.comp
     sorry
