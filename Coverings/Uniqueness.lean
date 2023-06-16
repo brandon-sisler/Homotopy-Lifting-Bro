@@ -16,8 +16,6 @@ namespace IsCoveringMap
 variable {E X : Type _} [TopologicalSpace E] [TopologicalSpace X] (f : E → X) (s t: Set X)
 
 
-#check IsLocallyConstant.iff_exists_open
-
 
 /- 
 
@@ -124,8 +122,7 @@ lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
   cases' hright with h1 h2 
   use hleft 
   use h1 
-  dsimp at h2 
-  dsimp 
+  dsimp only [Set.preimage_compl] 
   rw [isOpen_compl_iff]
   exact h2   
 
@@ -190,13 +187,31 @@ theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
     exact con_map
   have re : (fun x => (g x, h x)) ⁻¹' Set.diagonal Y = {x |h x = g x} := by 
     ext n  
-    simp
+    simp only [Set.mem_preimage, Set.mem_diagonal_iff, Set.mem_setOf_eq]
     tauto 
   rw[←re]
   exact this
 
 
 --- Statement of the Theorem ---
+
+
+
+
+/-
+      
+
+          Y -------------->  X               
+         ^  \                ^ 
+         |   \               |
+         |       \ H₂        |
+         |        \          |  f ;   if the triangles commute then H₁=H₂.  
+         |      H₁     \     |
+         |              \    |
+         |                >  |
+        Π₀Y  ------------->  E             
+
+-/
 
 theorem uniqueness_of_homotopy_lifting (Y : Type _) [TopologicalSpace Y] (hf : IsCoveringMap f)
   (H₁ H₂ : ContinuousMap Y E) (h : f ∘ H₁ = f ∘ H₂)
@@ -212,50 +227,16 @@ theorem uniqueness_of_homotopy_lifting (Y : Type _) [TopologicalSpace Y] (hf : I
   have H₁Cont: Continuous H₁:= ContinuousMap.continuous H₁ 
   have H₂Cont: Continuous H₂:= ContinuousMap.continuous H₂
 
-/- S is clopen proof Part 1 : by Lemma is_clopen_of_is_clopen_coe it suffices 
-to prove that U_y ∩ S is clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly 
-covered nbhd V_y by defn of covering and U_y := F^{-1}(V_y)) -/
-
-
-
-
-/- S is clopen proof Part 2(a) : U_y ∩ S = {z ∈ U_y ∣ H₁(z) = H₂(z)} -/
-
-
-
-/- S is clopen proof Part 2(b) : ∃ discrete topological space D such that 
-f⁻¹(V_y) ≅ V_y × D := by defn of covering -/
-
-
-
-/- S is clopen proof Part 2(c) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} is clopen in U_y := 
-by Lemma 2 -/
-
-
-
-/- S is clopen proof Part 2(d) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} 
-= {z ∈ U_y ∣ H₁(z) = H₂(z)} and {z ∈ U_y ∣ H₁(z) = H₂(z)} clopen by 2(c) and 
- -/
-
-
-
-/- S is clopen proof Part 2(e) : S is clopen by Part 1 and Part 2(a) -/
-
-
-
-/- Proof that S = Y using Lemma 3 -/
-
-
-
-/- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
-  
-
-/- S is clopen proof Part 1 : by Lemma 1 it suffices to prove that U_y ∩ S is
-clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
-of covering and U_y := F^{-1}(V_y)) -/
-
 
   have ClopenS : IsClopen S := by
+
+    /- 
+    
+    By Lemma is_clopen_of_is_clopen_coe it suffices 
+    to prove that for every y there is open U_y that U_y ∩ S is clopen in U_y 
+
+    -/
+
     apply is_clopen_of_is_clopen_coe
     intro y
     
@@ -264,13 +245,28 @@ of covering and U_y := F^{-1}(V_y)) -/
     rcases hf with ⟨DT, TrivN, xTrivN ⟩   
     let U_y := ((f∘ H₁)⁻¹' TrivN.baseSet)
     
-    use  U_y  
+    have hFu : ∀ u' ∈ U_y , (f ∘ H₂) u' ∈ TrivN.baseSet := by 
+          intro u'
+          intro Q
+          show u' ∈ (f ∘ H₂)⁻¹' (TrivN.baseSet)  
+          rw [← h]
+          exact Q
+
     have UyNy: U_y∈ 𝓝 y:= by
       rw [IsOpen.mem_nhds_iff]
       · exact xTrivN
       apply  Continuous.isOpen_preimage 
       · exact Continuous.comp fCont H₁Cont
       · exact TrivN.open_baseSet
+
+    have FuU_yEq :∀ u:U_y, f (H₁ u) = f (H₂ u) := by
+        intro u
+        calc
+        f (H₁ u)=(f∘  H₁) u:=  rfl
+        _=(f∘ H₂) u:= by rw [h]
+
+    use  U_y  
+    
     
     use UyNy
     dsimp only [Set.preimage_setOf_eq]
@@ -278,32 +274,18 @@ of covering and U_y := F^{-1}(V_y)) -/
     have key : ∀ u : U_y, H₁ u = H₂ u ↔ (TrivN (H₁ u)).2 = (TrivN (H₂ u)).2 := by
       intro u
       
-      have FuBaseSet : (f ∘ H₂) u ∈ TrivN.baseSet := by
+      have FuBaseSet : (f ∘ H₂) u ∈ TrivN.baseSet :=  (hFu u) (Subtype.mem u)
         
-        have hFu : ∀ u' ∈ U_y , (f ∘ H₂) u' ∈ TrivN.baseSet := by 
-          intro u'
-          intro Q
-          show u' ∈ (f ∘ H₂)⁻¹' (TrivN.baseSet)  
-          rw [← h]
-          exact Q
-        
-        specialize hFu u
-        apply hFu
-        exact Subtype.mem u
-
       
       constructor
       intro H₁ueqH₂u
       · exact congrArg Prod.snd (congrArg (↑TrivN) H₁ueqH₂u)
       
-      have FuEq : f (H₁ u) = f (H₂ u) := by
-        calc
-        f (H₁ u)=(f∘  H₁) u:=  rfl
-        _=(f∘ H₂) u:= by rw [h]
+      
       
       have H₁uSource: H₁ u ∈ TrivN.source:= by
         rw [TrivN.mem_source]
-        rw [FuEq]
+        rw [FuU_yEq u]
         exact FuBaseSet
 
       have H₂uSource: H₂ u ∈ TrivN.source:= by
@@ -322,31 +304,37 @@ of covering and U_y := F^{-1}(V_y)) -/
       rw [TrivN.proj_toFun (H₁ u) H₁uSource]
       rw [TrivN.proj_toFun (H₂ u) H₂uSource]
       
-      exact FuEq
+      exact FuU_yEq u
       exact congrArg Subtype.val H₁ProjeqH₂Proj
     
     simp_rw [key]
     
     apply clopen_equalizer_of_discrete
-    
     apply Continuous.snd 
-    apply Continuous.comp
-    sorry      
-    --apply continuous_subtype_coe 
-    rw [continuous_def]
-    intro B hB
-    use H₁⁻¹' B
-    constructor
     
-    --constructor 
-    --constructor
-    sorry
-    simp
-    sorry
+    have H₁USource: ∀ u : U_y, H₁ ((Subtype.val : U_y → Y) u) ∈ TrivN.source:= by 
+      simp only [Subtype.forall, Set.mem_preimage, Function.comp_apply]
+      intro var
+      rw[ TrivN.mem_source]
+      simp only [imp_self]
+
+    exact TrivN.continuous_toFun.comp_continuous (H₁Cont.comp continuous_subtype_val) H₁USource
+    
     apply Continuous.snd
-    apply Continuous.comp
-    sorry
-    sorry
+    
+    have H₂USource: ∀ u : U_y, H₂ ((Subtype.val : U_y → Y) u) ∈ TrivN.source:= by 
+      simp only [Subtype.forall, Set.mem_preimage, Function.comp_apply]
+      intro var
+      rw[ TrivN.mem_source]
+      have FuEq : f (H₁ var) = f (H₂ var) := by
+        calc
+        f (H₁ var)=(f∘  H₁) var:=  rfl
+        _=(f∘ H₂) var:= by rw [h]
+      rw [FuEq]
+      simp only [imp_self]
+    exact TrivN.continuous_toFun.comp_continuous (H₂Cont.comp continuous_subtype_val) H₂USource
+
+
 
 
   have SEqUniv : S = Set.univ := by 
@@ -391,3 +379,39 @@ by Lemma 2 -/
 
 /- Proof that S = Y using Lemma 3 -/
 
+
+
+/- S is clopen proof Part 2(a) : U_y ∩ S = {z ∈ U_y ∣ H₁(z) = H₂(z)} -/
+
+
+
+/- S is clopen proof Part 2(b) : ∃ discrete topological space D such that 
+f⁻¹(V_y) ≅ V_y × D := by defn of covering -/
+
+
+
+/- S is clopen proof Part 2(c) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} is clopen in U_y := 
+by Lemma 2 -/
+
+
+
+/- S is clopen proof Part 2(d) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} 
+= {z ∈ U_y ∣ H₁(z) = H₂(z)} and {z ∈ U_y ∣ H₁(z) = H₂(z)} clopen by 2(c) and 
+ -/
+
+
+
+/- S is clopen proof Part 2(e) : S is clopen by Part 1 and Part 2(a) -/
+
+
+
+/- Proof that S = Y using Lemma 3 -/
+
+
+
+/- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
+  
+
+/- S is clopen proof Part 1 : by Lemma 1 it suffices to prove that U_y ∩ S is
+clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
+of covering and U_y := F^{-1}(V_y)) -/
