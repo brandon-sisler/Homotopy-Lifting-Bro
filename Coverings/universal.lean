@@ -5,36 +5,12 @@ import Mathlib.Topology.Basic
 open Set Topology
 
 variable {X : Type _} [TopologicalSpace X] (x₀ : X) {x₁ : X }
--- def baseSet : TopologicalSpace X 
 
-#check X
-
-
---#check coverSet
-#synth TopologicalSpace (Path x₀ x₁)
-
---example : IsOpen (univ : Cover) := 
- -- isOpen_univ
+-- #synth TopologicalSpace (Path x₀ x₁)
 
 open TopologicalSpace
-
-
-
-
-
-
-
-
-
-
-
 open ContinuousMap
-
-
-
-
-
--- Semi Simply connected: 
+ 
 def inc_path {X: Type _} [TopologicalSpace X] 
          (U: Set X) (x y: U) (p : Path x y): Path (x:X) (y:X) where
       toFun t := p t
@@ -42,18 +18,11 @@ def inc_path {X: Type _} [TopologicalSpace X]
       source' := by simp
       target' := by simp
 
-
-
-
 def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop :=
   ∃ (hx : x ∈ U), ∀ p : Path (X := U) ⟨x, hx⟩ ⟨x, hx⟩, Path.Homotopic (inc_path _ _ _ p) (Path.refl _) 
 
-
 lemma subset_slsc_is_slsc {X: Type _} [TopologicalSpace X] (x:X){U V: Set X} (slscU: slsc_subspace x U) (VU: V ⊆ U)(xinV: x ∈ V):
   slsc_subspace x V := by sorry 
-
-
-
 
 def slsc_pc_subspace {X: Type _} [TopologicalSpace X] (U: Set X) : Prop :=
   ∃ x, slsc_subspace x U ∧ IsPathConnected U ∧ U.Nonempty
@@ -61,14 +30,7 @@ def slsc_pc_subspace {X: Type _} [TopologicalSpace X] (U: Set X) : Prop :=
 class slsc_space (X: Type _)[TopologicalSpace X] where
    slsc_nbhd_exists : ∀ x : X, ∃ U : Set X, IsOpen U ∧  slsc_subspace x U 
 
-#check slsc_space.slsc_nbhd_exists
-
--- To show the path connected subsets of X is a basis
---(Possibly use the basis from Topology.PathConnected)
-
-
 -- Define the potential basis whose elements are slsc and path connected
---(Make this smaller)
 def slsc_pc_nbhds (X: Type _)[TopologicalSpace X]: Set (Set X):= 
   { U : Set X | IsOpen U ∧ slsc_pc_subspace U } 
 
@@ -110,23 +72,15 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
     --rcases(path_connected_basis a).mem_iff.mp U_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U⟩
 
--- We will use this to get a map that assigns to each non-empty subset of X a point in it
-
--- curly braces {} it so that one does not need to specify a space
 noncomputable
 def get_point {X: Type _} (U : Set  X) (h : U.Nonempty) : X := h.choose
 
 lemma slsc_nbhd_is_nonempty (X : Type _) [TopologicalSpace X] (U : slsc_pc_nbhds X) : U.1.Nonempty :=
   sorry
 
-
 -- The universal cover is defined to be the quotient of the path space of X modulo the equivalence relation generated     
 def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
   Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
-
-variable (g : Path.Homotopic.Quotient x₀ x₁)
-
-
 
 def temp (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : slsc_pc_nbhds X) ( γ : Path x₀ (get_point U (slsc_nbhd_is_nonempty X U ) )) (u : U.1) : UniversalCover X x₀ :=
   
