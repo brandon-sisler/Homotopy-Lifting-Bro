@@ -1,111 +1,234 @@
---import Mathlib.Topology.Instances.Real
-import Mathlib.Topology.Homotopy.Basic
-import Mathlib.Topology.IsLocallyHomeomorph
---import Mathlib.Topology.FiberBundle.basic
-import Mathlib.Topology.LocallyConstant.Basic
-import Mathlib.SetTheory.Cardinal.Basic
 import Mathlib.Topology.Covering
---import Mathlib.Topology.basic
+import Mathlib.Topology.Connected 
+import Mathlib.Topology.Basic
+import Mathlib.Topology.IsLocallyHomeomorph
+import Mathlib.Topology.FiberBundle.Basic
+import Mathlib.Topology.Instances.Real
+import Mathlib.SetTheory.Cardinal.Basic 
+import Mathlib.Topology.LocallyConstant.Basic
+open Cardinal Topology
 
+set_option autoImplicit false
 set_option maxHeartbeats 0
 
-open Set Filter Topology
+namespace IsCoveringMap
+
+variable {E X : Type _} [TopologicalSpace E] [TopologicalSpace X] (f : E → X) (s t: Set X)
+
+-- If f is a bijective covering map then it is a homeomorphism
+noncomputable def toHomeomorph (hf : IsCoveringMap f)
+(h : Function.Bijective f) : Homeomorph E X := 
+  Homeomorph.homeomorphOfContinuousOpen (Equiv.ofBijective f h ) (IsCoveringMap.continuous hf) (IsCoveringMap.isOpenMap hf)
+
+-- homeomorph.homeomorph_of_continuous_open (equiv.of_bijective f h) hf.continuous hf.is_open_map
+
+#check IsLocallyConstant.iff_exists_open
 
 
+/- 
 
+  Following lemma states that if a clopen set S ⊆ Y intersects with all the connected 
+  components of Y, then S = Y
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-variable (Y:Type _)  [TopologicalSpace Y](S : Set Y)
-
- 
-
-
-/- Lemma 1 stating that a set S ⊆ Y is clopen in Y ↔ ∀ y ∈ Y ∃ nbhd U_y of y 
-such that U_y ∩ S is clopen in U_y -/
-
-lemma ClopenIffNbhdClopen (Y: Type _) [TopologicalSpace Y](S : Set Y) :
- (∀ y :  Y, ∃ U: Set Y,  U ∈ 𝓝 y) ↔ IsClopen S := by sorry
-
-
-
-/- Lemma 1 proof -/
-
-
-
-/- Lemma 2 stating that if f, g : X → Y are continuous and Y is a discrete topological
-space, then {x ∈ X ∣ f(x) = g(x)} is clopen in X -/
-
-lemma EquilizerOfDiscreteIsClopen (X Y: Type _) [TopologicalSpace X] [TopologicalSpace Y]
-  [DiscreteTopology Y] (f g:ContinuousMap X Y)  : 
-  IsClopen {x : X | f x = g x} := by sorry
+  main idea in the proof: If a clopen set intersects a connected component then 
+  the clopen set must contain that connected component 
   
+-/
 
-/- Lemma 2 proof -/
-
-
-
-/- Lemma 3 stating that if a clopen set S ⊆ Y intersects with all the connected components of Y, then S = Y -/
-
-#check connectedComponent
 #check IsClopen.connectedComponent_subset
 
-lemma ClopenInterConnectedCompUniv (Y: Type _)[TopologicalSpace Y](S: Set Y)(hS: IsClopen S)
-(h: ∀x :Y, ∃ y∈ connectedComponent x, y∈ S): S=Set.univ := by
+
+lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [TopologicalSpace Y]
+  (S : Set Y) (hS : IsClopen S) (w : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S) :
+  S = Set.univ := by 
+  apply Set.eq_univ_of_forall 
+  intro x 
+  specialize w x 
+  cases' w with y h1
+  have con_same : connectedComponent x = connectedComponent y := connectedComponent_eq (h1.1)
+  have y_con: connectedComponent y ⊆ S := by 
+    apply IsClopen.connectedComponent_subset   
+    exact hS
+    exact h1.2
+  have con_sub : connectedComponent x ⊆ S := by 
+    rw[con_same] 
+    exact y_con
+  have x_in_con : x ∈ connectedComponent x := mem_connectedComponent 
+  exact con_sub x_in_con 
 
 
-/- Lemma 3 proof -/
-  ext z                   
-  constructor
-  · exact fun _ => trivial
-  intro 
-  specialize h z
-  rcases h with ⟨y,hy, yS⟩ 
-  have h1:= IsClopen.connectedComponent_subset hS yS
-  have h2 : z∈ connectedComponent y := by
-    rw [← connectedComponent_eq_iff_mem]
-    exact connectedComponent_eq hy
-  apply h1
-  exact h2
+
+
+
+/- 
+    Following key theorem states that a set A ⊆ Y is open in Y ↔ for every y ∈ Y 
+    there is a nbhd U_y of y such that U_y ∩ A is open in U_y 
+
+    Follows by parsing the definitions
+
+    Note that this is an if and only if statement
+-/
+
+
+
+
+
+#check mem_nhds_iff
+#check Set.inter_subset_left
+#check IsOpen.preimage
+#check continuous_inclusion
+#check isOpen_iff_forall_mem_open
+
+
+
+lemma is_open_of_is_open_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
+    (hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), 
+    IsOpen ((Subtype.val : U → Y) ⁻¹' A)) : IsOpen A := by 
+
+    rw[isOpen_iff_forall_mem_open] 
+    intro x 
+    specialize hA x 
+    intro xA 
+    rcases hA with ⟨ U, UNx, W, Wopen,hW⟩
+    have hW1: W ∩ U = A ∩ U := by
+      rw[← Subtype.preimage_val_eq_preimage_val_iff]
+      exact hW
+    have UNx':∃ V, V ⊆ U ∧ IsOpen V ∧ x ∈ V := by
+      rw [← mem_nhds_iff]
+      exact UNx
+    rcases UNx' with ⟨V,VU,Vopen,xV⟩ 
+    use W ∩ V
+    constructor
+    rintro v ⟨ vW,vV⟩
+    apply Set.inter_subset_left A U  
+    rw [← hW1]
+    constructor
+    exact vW
+    apply VU
+    exact vV
+    constructor
+    exact IsOpen.inter Wopen Vopen
+    constructor
+    apply Set.inter_subset_left W U
+    rw [hW1]
+    constructor
+    exact xA
+    apply VU
+    exact xV
+    exact xV
+
+
+/- 
+    Corollary of the above theorem is that a set A ⊆ Y is closed in Y ↔ for every y ∈ Y 
+    there is a nbhd U_y of y such that U_y ∩ A is closed in U_y
+
+    Use above theorem for complement of A  
+-/
+
+
+lemma is_closed_of_is_closed_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
+(hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), IsClosed ((Subtype.val : U → Y) ⁻¹' A)) : IsClosed A := by 
+  rw [← isOpen_compl_iff]
+  apply is_open_of_is_open_coe 
+  intro x 
+  specialize hA x 
+  cases' hA with hleft hright 
+  cases' hright with h1 h2 
+  use hleft 
+  use h1 
+  dsimp at h2 
+  dsimp 
+  rw [isOpen_compl_iff]
+  exact h2   
+
+
+/- 
+    A direct consequence is that a set A ⊆ Y is clopen in Y ↔ for every y ∈ Y 
+    there is a nbhd U_y of y such that U_y ∩ A is clopen in U_y
+
+    Use above theorem for complement of A  
+-/
+
+
+lemma is_clopen_of_is_clopen_coe (Y:Type _) [TopologicalSpace Y] (A: Set Y)
+(hA : ∀ x : Y, ∃ (U : Set Y) (_ : U ∈ 𝓝 x), IsClopen ((Subtype.val : U → Y) ⁻¹' A)) : IsClopen A := by
+  have left : IsOpen A := by
+    apply is_open_of_is_open_coe Y A 
+    intro x 
+    specialize hA x 
+    cases' hA with hleft hright
+    use hleft 
+    cases' hright with hleft hright
+    use hleft 
+    exact hright.1 
+
+  have right : IsClosed A := by
+    apply is_closed_of_is_closed_coe Y A 
+    intro x 
+    specialize hA x 
+    cases' hA with hleft hright
+    use hleft 
+    cases' hright with hleft hright
+    use hleft 
+    exact hright.2 
+
+  exact ⟨left, right ⟩ 
+
+
+
+
+
+/- 
+ 
+    Following lemma states that if f, g : X → Y are continuous and Y is a discrete topological
+    space, then {x ∈ X ∣ f(x) = g(x)} is clopen in X 
+    
+    Main idea is to construct the function (f, g) : X → Y × Y.
+    Then {x ∈ X ∣ f(x) = g(x)} is the inverse image of the diagonal in Y × Y
+
+-/
+
+
+
+theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
+  [DiscreteTopology Y] {h g : X → Y} (hf : Continuous h) (hg : Continuous g) :
+  IsClopen {x : X | h x = g x} := by 
+  have diag_cl : IsClopen (Set.diagonal Y) := by 
+    apply isClopen_discrete
+  have con_map : Continuous (fun x => (g x, h x)) := by
+    apply continuous_prod_mk.mpr 
+    constructor 
+    exact hg 
+    exact hf 
+  have : IsClopen (((fun x => (g x, h x))) ⁻¹' (Set.diagonal Y)) := by
+    apply IsClopen.preimage
+    exact diag_cl
+    exact con_map
+  have re : (fun x => (g x, h x)) ⁻¹' Set.diagonal Y = {x |h x = g x} := by 
+    ext n  
+    simp
+    tauto 
+  rw[←re]
+  exact this
+
+
+
 
 
 
 --- Statement of the Theorem ---
 
 
-theorem UniquenessOfHomotopyLifting (Y X E: Type _) 
-[TopologicalSpace Y][TopologicalSpace X][TopologicalSpace E]
-(f:ContinuousMap E X)(hf: IsCoveringMap f)
-(H₁ H₂ : ContinuousMap Y E)(h: f ∘ H₁ = f ∘ H₂)
-(hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) : H₁ = H₂  := by 
 
   
 
 /- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
-  let S:= {y:Y | H₁ y = H₂ y}
   
 
 /- S is clopen proof Part 1 : by Lemma 1 it suffices to prove that U_y ∩ S is
 clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
 of covering and U_y := F^{-1}(V_y)) -/
 
-  have ClopenS : IsClopen S := by
-   rw [← ClopenIffNbhdClopen]
-   sorry
    
 
 
@@ -140,7 +263,6 @@ by Lemma 2 -/
 
 
 
-  sorry
 
 
 
@@ -148,10 +270,149 @@ by Lemma 2 -/
 
 
 
+theorem uniqueness_of_homotopy_lifting (Y : Type _) [TopologicalSpace Y] (hf : IsCoveringMap f)
+  (H₁ H₂ : ContinuousMap Y E) (h : f ∘ H₁ = f ∘ H₂)
+  (hC : ∀ x : Y, ∃ y ∈ connectedComponent x, H₁ y = H₂ y) :
+  H₁ = H₂ := by 
+
+
+/- Define S := {y ∈ Y ∣ H₁(y) = H₂(y)} -/
+  let S:= {y:Y | H₁ y = H₂ y}
+  
+
+/- S is clopen proof Part 1 : by Lemma 1 it suffices to prove that U_y ∩ S is
+clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
+of covering and U_y := F^{-1}(V_y)) -/
+
+  have fCont: Continuous f:= IsCoveringMap.continuous hf 
+  have H₁Cont: Continuous H₁:= ContinuousMap.continuous H₁ 
+  have H₂Cont: Continuous H₂:= ContinuousMap.continuous H₂
+
+
+  have ClopenS : IsClopen S := by
+    apply is_clopen_of_is_clopen_coe
+    intro y
+    
+    let x:=(f (H₁ y))
+    specialize hf (x)
+    rcases hf with ⟨DT, TrivN, xTrivN ⟩   
+    let U_y := ((f∘ H₁)⁻¹' TrivN.baseSet)
+    
+    use  U_y  
+    have UyNy: U_y∈ 𝓝 y:= by
+      rw [IsOpen.mem_nhds_iff]
+      · exact xTrivN
+      apply  Continuous.isOpen_preimage 
+      · exact Continuous.comp fCont H₁Cont
+      · exact TrivN.open_baseSet
+    
+    use UyNy
+    dsimp only [Set.preimage_setOf_eq]
+    
+    have key : ∀ u : U_y, H₁ u = H₂ u ↔ (TrivN (H₁ u)).2 = (TrivN (H₂ u)).2 := by
+      intro u
+      
+      have FuBaseSet : (f ∘ H₂) u ∈ TrivN.baseSet := by
+        
+        have hFu : ∀ u' ∈ U_y , (f ∘ H₂) u' ∈ TrivN.baseSet := by 
+          intro u'
+          intro Q
+          show u' ∈ (f ∘ H₂)⁻¹' (TrivN.baseSet)  
+          rw [← h]
+          exact Q
+        
+        specialize hFu u
+        apply hFu
+        exact Subtype.mem u
+
+      
+      constructor
+      intro H₁ueqH₂u
+      · exact congrArg Prod.snd (congrArg (↑TrivN) H₁ueqH₂u)
+      
+      have FuEq : f (H₁ u) = f (H₂ u) := by
+        calc
+        f (H₁ u)=(f∘  H₁) u:=  rfl
+        _=(f∘ H₂) u:= by rw [h]
+      
+      have H₁uSource: H₁ u ∈ TrivN.source:= by
+        rw [TrivN.mem_source]
+        rw [FuEq]
+        exact FuBaseSet
+
+      have H₂uSource: H₂ u ∈ TrivN.source:= by
+        rw [TrivN.mem_source]
+        exact FuBaseSet
+
+      intro H₁ProjeqH₂Proj
+      apply TrivN.injOn 
+      
+      exact H₁uSource
+      exact H₂uSource
+      
+      
+      ext
+
+      rw [TrivN.proj_toFun (H₁ u) H₁uSource]
+      rw [TrivN.proj_toFun (H₂ u) H₂uSource]
+      
+      exact FuEq
+      exact congrArg Subtype.val H₁ProjeqH₂Proj
+    
+    simp_rw [key]
+    
+    apply clopen_equalizer_of_discrete
+    
+    apply Continuous.snd 
+    apply Continuous.comp
+    sorry      
+    sorry
+    
+    apply Continuous.snd
+    apply Continuous.comp
+    sorry
+    sorry
+
+
+  have SEqUniv : S = Set.univ := by 
+    apply clopen_set_intersect_connected_components_whole_set 
+    exact ClopenS 
+    exact hC 
+  
+  ext z
+  
+  have zS : z ∈ S := by  
+    rw [SEqUniv]
+    exact trivial 
+  
+  exact zS 
+   
 
 
 
+/- S is clopen proof Part 2(a) : U_y ∩ S = {z ∈ U_y ∣ H₁(z) = H₂(z)} -/
 
 
 
+/- S is clopen proof Part 2(b) : ∃ discrete topological space D such that 
+f⁻¹(V_y) ≅ V_y × D := by defn of covering -/
+
+
+
+/- S is clopen proof Part 2(c) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} is clopen in U_y := 
+by Lemma 2 -/
+
+
+
+/- S is clopen proof Part 2(d) : {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} 
+= {z ∈ U_y ∣ H₁(z) = H₂(z)} and {z ∈ U_y ∣ H₁(z) = H₂(z)} clopen by 2(c) and 
+ -/
+
+
+
+/- S is clopen proof Part 2(e) : S is clopen by Part 1 and Part 2(a) -/
+
+
+
+/- Proof that S = Y using Lemma 3 -/
 
