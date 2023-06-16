@@ -6,11 +6,11 @@ open Set Topology
 
 variable {X : Type _} [TopologicalSpace X] (x₀ : X) {x₁ : X }
 
--- #synth TopologicalSpace (Path x₀ x₁)
+--#synth TopologicalSpace (Path x₀ x₁)
 
 open TopologicalSpace
 open ContinuousMap
- 
+
 def inc_path {X: Type _} [TopologicalSpace X] 
          (U: Set X) (x y: U) (p : Path x y): Path (x:X) (y:X) where
       toFun t := p t
