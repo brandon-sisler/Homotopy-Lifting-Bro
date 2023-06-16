@@ -29,6 +29,12 @@ noncomputable def toHomeomorph (hf : IsCoveringMap f)
 -- (is_locally_constant.iff_exists_open _).2 $ λ x, let ⟨t, ht⟩ := (hf x).2 in
 --   ⟨_, t.open_base_set, ht, λ y hy, (t.preimage_singleton_homeomorph hy).to_equiv.cardinal_eq⟩
 
+
+/-
+  Following lemma states that if a clopen set S intersects every connected component
+  then it is the whole set
+-/
+
 lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [TopologicalSpace Y]
   (S : Set Y) (hS : IsClopen S) (w : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S) :
   S = Set.univ := by 
