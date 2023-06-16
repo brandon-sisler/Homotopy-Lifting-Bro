@@ -160,8 +160,16 @@ def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X)
   range fun p : ( Σ U : {U' : Set X // U' ∈ slsc_pc_nbhds X} , Path x₀ (get_point U.1 (slsc_nbhd_is_nonempty X U.2 )) ) 
     ↦  all_local_compositions X x₀ p.1.1 p.1.2 p.2  --all_local_compositions X x₀ p.1 _ --p.2
 
-instance (X : Type _) [TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space X] (x₀ : X) : TopologicalSpace (UniversalCover X x₀) :=  
+instance {X : Type _} [TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space X] (x₀ : X) : TopologicalSpace (UniversalCover X x₀) :=  
   generateFrom (lifts_of_slsc_pc_nbhds X x₀)
+
+--Need to prove the U_γ are actually U_[γ] aka independence of homotopy class of γ
+
+--Lemma to prove propert (*) in hatcher
+lemma property_star {X: Type _} [TopologicalSpace X] [lpc: LocPathConnectedSpace X] 
+  [slsc: slsc_space X] {x₀ : X} (Y : UniversalCover X x₀) (y: Y) (U : Set X) (h : U ∈ slsc_pc_nbhds X) 
+  ( γ : Path x₀ (get_point U (slsc_nbhd_is_nonempty X h ))) (U_gamma : all_local_compositions X x₀ U h γ)
+  : y ∈ U_gamma → all_local_compositions X x₀ U h y:= by sorry
 
 lemma lifts_of_slsc_pc_nbhds_is_basis {X: Type _} [TopologicalSpace X] [lpc: LocPathConnectedSpace X] 
   [slsc: slsc_space X] (x₀ : X) (Y : UniversalCover X x₀) :
