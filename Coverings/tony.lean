@@ -8,6 +8,7 @@ import Mathlib.Topology.Order.Basic
 import Mathlib.Topology.SubsetProperties
 import Mathlib.Data.Set.Prod
 import Mathlib.Data.Set.Lattice
+--import Mathlib.Data.Finset.Sort
 
 --set_option autoImplicit false
 
@@ -21,6 +22,8 @@ open Set
 instance : NoMaxOrder ↑I := by sorry
 instance : NoMinOrder ↑I := by sorry
 
+
+ -- SECTION 1
 structure ConstructionData  [TopologicalSpace Y] [TopologicalSpace X] [TopologicalSpace Xt] (p: Xt → X)
     (F: I → Y → X) where
   U : Y → I → Set Y
@@ -32,7 +35,6 @@ structure ConstructionData  [TopologicalSpace Y] [TopologicalSpace X] [Topologic
   a_lt : ∀ y: Y, ∀ t: I, a y t < t
   lt_b : ∀ y: Y, ∀ t: I, t < b y t    
   sub_triv : ∀ y: Y, ∀ t: I, (Ioo (a y t) (b y t)) ×ˢ U y t ⊆ (uncurry F) ⁻¹' ((qt y t).baseSet)
-
 
 lemma aux₁ 
   [TopologicalSpace Y] [TopologicalSpace X] [TopologicalSpace Xt]
@@ -102,6 +104,8 @@ def mkConstructionData
     lt_b := fun y t ↦ (aux₁ hp CF y t).choose_spec.choose_spec.choose_spec.2.1.2
     sub_triv := fun y t ↦ (aux₁ hp CF y t).choose_spec.choose_spec.choose_spec.2.2
 
+
+ -- SECTION 2
 def ConstructionData.box {p: Xt → X}
     {F: I → Y → X} (data : ConstructionData p F) := 
     fun y t => Set.prod (data.U y t) (Set.Ioo (data.a y t) (data.b y t))
@@ -163,32 +167,7 @@ theorem existence_of_homotopy_lifting
   (CF0t: Continuous F0t) 
   (hF0tp : F 0 = p ∘ F0t) : 
   ∃ Ft : I → Y → Xt, Continuous (uncurry Ft) ∧ ∀ t, p ∘ (Ft t) = F t ∧
-  Ft 0 = F0t := by
-  let data := mkConstructionData hp CF
-  have Ft : I → Y → Xt := by
-    intro t
-    intro y
-    let opencover := data.box_cover y
-    have hcover: Set.prod {y} (univ) ⊆ opencover  := by
-      exact data.box_cover_covers y 
-    have hopen : ∀ (t: I), IsOpen (data.box y t) := by
-      exact data.box_cover_open y
-    have I_is_compact : IsCompact ({y} ×ˢ (univ : Set I)) := by
-      exact isCompact_singleton.prod isCompact_univ
-    have JJ := I_is_compact.elim_finite_subcover (data.box y) hopen hcover
-    choose J hJ using JJ
-    have N := ⋂ (i: I) (_ : i ∈ J), data.U y i
-    have triv := data.qt y t
-    have sort : (Fin J.card → J):= by
-      sorry
-    sorry
-  sorry
-
-
-
-
-
-
+  Ft 0 = F0t := by sorry
 
 theorem test (Y X Xt : Type _)
   [instY: TopologicalSpace Y] [instX: TopologicalSpace X] [instXt: TopologicalSpace Xt]
@@ -200,9 +179,38 @@ theorem test (Y X Xt : Type _)
   (F0t: Y → Xt)
   (CF0t: Continuous F0t) 
   (hF0tp : F 0 = p ∘ F0t) : 
-  ∀ y : Y, ∃ U ∈ 𝓝 y, ∃ Ft : I → Y → Xt, ContinuousOn (uncurry Ft) (univ ×ˢ U) 
-  ∧ EqOn (Ft 0) F0t U 
-  ∧ EqOn (uncurry F) (p ∘ uncurry Ft) (univ ×ˢ U) := by sorry 
+    ∀ y : Y, ∃ U ∈ 𝓝 y, ∃ Ft : I → Y → Xt, ContinuousOn (uncurry Ft) (univ ×ˢ U) 
+    ∧ EqOn (Ft 0) F0t U 
+    ∧ EqOn (uncurry F) (p ∘ uncurry Ft) (univ ×ˢ U) := by
+  intro yq
+  let data := mkConstructionData hp CF
+  let opencover := data.box_cover yq
+  have hcover: Set.prod {yq} (univ) ⊆ opencover  := by
+    exact data.box_cover_covers yq 
+  have hopen : ∀ (t: I), IsOpen (data.box yq t) := by
+    exact data.box_cover_open yq
+  have I_is_compact : IsCompact ({yq} ×ˢ (univ : Set I)) := by
+    exact isCompact_singleton.prod isCompact_univ
+  have JJ := I_is_compact.elim_finite_subcover (data.box yq) hopen hcover
+  choose J hJ using JJ
+  have N := ⋂ (i: I) (_ : i ∈ J), data.U yq i
+  use N
+  -- have q : ∀ y: Y, ∃ J: Finset I,  
+  have Ft : I → Y → Xt := by
+    intro t
+    intro y
+    --have J_is_nonempty : (∃ Ft : N × Set.Icc 0 (i:J)) ∅ := by sorry
+    --have := finset.induction_on_min J 
+    --have := finset.sort_to_finset J
+    have triv := data.qt y t
+    sorry
+  sorry
+
+
+
+
+
+
   
 
 
