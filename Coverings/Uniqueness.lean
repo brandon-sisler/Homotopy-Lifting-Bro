@@ -63,6 +63,8 @@ lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [Topologic
 /- 
     Following key theorem states that a set A ⊆ Y is open in Y ↔ for every y ∈ Y 
     there is a nbhd U_y of y such that U_y ∩ A is open in U_y 
+
+    Follows by parsing the definitions
 -/
 
 
