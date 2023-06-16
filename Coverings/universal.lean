@@ -115,15 +115,7 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     have slscV : slsc_subspace a V:= by exact subset_slsc_is_slsc a slscUW hVUW (hSV ainS)
     use V
     constructor 
-    . constructor
-      exact openV
-      use a
-      constructor
-      . exact slscV
-      . constructor
-        . exact pcV
-        . sorry
-
+    . exact ⟨ openV, ⟨ a, ⟨ slscV , pcV, ⟨ a, hSV ainS⟩ ⟩ ⟩⟩  
     . constructor
       . exact hSV ainS
       . exact subset_trans hVUW (inter_sub_left U W) 
