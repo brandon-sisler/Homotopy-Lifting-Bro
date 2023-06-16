@@ -65,6 +65,8 @@ lemma clopen_set_intersect_connected_components_whole_set (Y: Type _) [Topologic
     there is a nbhd U_y of y such that U_y ∩ A is open in U_y 
 
     Follows by parsing the definitions
+
+    Note that this is an if and only if statement
 -/
 
 
