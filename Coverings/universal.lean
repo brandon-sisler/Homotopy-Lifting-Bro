@@ -126,34 +126,36 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
 -- We will use this to get a map that assigns to each non-empty subset of X a point in it
 
 -- curly braces {} it so that one does not need to specify a space
-def get_point {X : Type _}(U : Set X) : U := 
+def get_point {X: Type _} (U : Set  X) : X := 
  sorry
 
-#check get_point
+
 
 -- The universal cover is defined to be the quotient of     
 def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
   Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
 
--- def inc_path (X: Type _) [TopologicalSpace X] 
---          (U: Set X) (x: U) (p : Path (x:U) (x:U)): Path (x:X) (x:X) where
-
-def get_all_local_compositions (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : Set X) ( γ : Path x₀ (get_point U)) : Set ( UniversalCover X x₀ ) := 
-  Σ u : U, { γ₁ : UniversalCover X x₀ | ∃ γ₀ : ( Path.Homotopic.Quotient (get_point U) u ) , γ₁ = Quotient.comp γ (inc_path X U u γ₀)}
-
-#check UniversalCover
+variable (g : Path.Homotopic.Quotient x₀ x₁)
 
 
+
+def temp (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : Set X) ( γ : Path x₀ (get_point U)) (u : U) : UniversalCover X x₀ :=
+  have test : Path.Homotopic.Quotient x₀ ( get_point U ) := by sorry
+  -- try to get the specific γ₁ on its own so that we can use get_all_local_compositions together as a set
+  -- Σ u : U, { γ₁ : UniversalCover X x₀ | ∃ γ₀ : Path ( get_point U )  u , γ₁ =  ⟨ _ , ⟦ γ.trans ( inc_path U ( get_point U ) u γ₀ ) ⟧ ⟩ }
+  thingy := ⟨ x₀ , test ⟩
+
+def all_local_compositions (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : slsc_pc_nbhds X) ( γ : Path x₀ (get_point U)): Set ( UniversalCover X x₀ ) := 
+  temp X x₀ U γ '' Set.univ 
+
+  
 
 -- lifts_of_slsc_pc_nbhds creates a collection of subsets of the universal cover which correspond
 -- to each homotopy equivalence class of paths
-def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X): Set (Set ( UniversalCover X x₀ )) :=
-  -- Need to take the slsc_pc_nbhds and turn them into a collection of sets insize of UniversalCover 
-  -- Need to choose a point in each U 
-  
-  #check slsc_pc_nbhds X
-  Σ U : slsc_pc_nbhds X, Σ γ₀ : Path x₀ (get_point U), get_all_local_compositions X x₀ U γ₀ 
-  
+def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X) ( U : slsc_pc_nbhds X) ( γ : Path x₀ ( get_point U ) ) : Set ( Set ( UniversalCover X x₀ )) :=
+  all_local_compositions X x₀ ''
+
+
 
 lemma lifts_of_slsc_pc_nbhds_is_basis {X: Type _} [TopologicalSpace X] [lpc: LocPathConnectedSpace X] [slsc: slsc_space X] (x₀ : X) (Y : UniversalCover X x₀) :
   IsTopologicalBasis ( lifts_of_slsc_pc_nbhds X x₀ ) := by 
