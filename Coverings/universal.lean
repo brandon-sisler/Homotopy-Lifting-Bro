@@ -96,7 +96,7 @@ lemma subset_slsc_is_slsc {X: Type _} [TopologicalSpace X] (x:X){U V: Set X} (sl
 
 
 def slsc_pc_subspace {X: Type _} [TopologicalSpace X] (U: Set X) : Prop :=
-  ∃ x, slsc_subspace x U ∧ IsPathConnected U
+  ∃ x, slsc_subspace x U ∧ IsPathConnected U ∧ U.Nonempty
 
 class slsc_space (X: Type _)[TopologicalSpace X] where
    slsc_nbhd_exists : ∀ x : X, ∃ U : Set X, IsOpen U ∧  slsc_subspace x U 
@@ -110,7 +110,7 @@ class slsc_space (X: Type _)[TopologicalSpace X] where
 -- Define the potential basis whose elements are slsc and path connected
 --(Make this smaller)
 def slsc_pc_nbhds (X: Type _)[TopologicalSpace X]: Set (Set X):= 
-  { U : Set X | IsOpen U ∧ slsc_pc_subspace U} 
+  { U : Set X | IsOpen U ∧ slsc_pc_subspace U } 
 
 -- To show that the slsc and path connected collection is a basis when X is a locally path connected space
 lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnectedSpace X][slsc: slsc_space X]:
@@ -153,12 +153,14 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
 -- We will use this to get a map that assigns to each non-empty subset of X a point in it
 
 -- curly braces {} it so that one does not need to specify a space
-def get_point {X: Type _} (U : Set  X) : X := 
- sorry
+noncomputable
+def get_point {X: Type _} (U : Set  X) (h : U.Nonempty) : X := h.choose
+
+lemma slsc_nbhd_is_nonempty (X : Type _) (U : slsc_pc_nbhds X) :=
+  sorry
 
 
-
--- The universal cover is defined to be the quotient of     
+-- The universal cover is defined to be the quotient of the path space of X modulo the equivalence relation generated     
 def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
   Σ x₁ : X , Path.Homotopic.Quotient x₀ x₁
 
@@ -166,32 +168,31 @@ variable (g : Path.Homotopic.Quotient x₀ x₁)
 
 
 
-def temp (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : Set X) ( γ : Path x₀ (get_point U)) (u : U) : UniversalCover X x₀ :=
-  have test : Path.Homotopic.Quotient x₀ ( get_point U ) := by sorry
+def temp (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : slsc_pc_nbhds X) ( γ : Path x₀ (get_point U (slsc_nbhd_is_nonempty X, U ) )) (u : U) : UniversalCover X x₀ :=
+  
+
   -- try to get the specific γ₁ on its own so that we can use get_all_local_compositions together as a set
   -- Σ u : U, { γ₁ : UniversalCover X x₀ | ∃ γ₀ : Path ( get_point U )  u , γ₁ =  ⟨ _ , ⟦ γ.trans ( inc_path U ( get_point U ) u γ₀ ) ⟧ ⟩ }
   thingy := ⟨ x₀ , test ⟩
 
-def all_local_compositions (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : slsc_pc_nbhds X) ( γ : Path x₀ (get_point U)): Set ( UniversalCover X x₀ ) := 
-  temp X x₀ U γ '' Set.univ 
+def all_local_compositions (X: Type _)[TopologicalSpace X] ( x₀ : X ) (U : slsc_pc_nbhds X) ( γ : Path x₀ (get_point U, (slsc_nbhd_is_nonempty X, U ))): Set ( UniversalCover X x₀ ) := 
+  temp X x₀ U h γ '' Set.univ 
 
-  
+#check fun p : Σ (U : slsc_pc_nbhds X), Path x₀ (get_point U (slsc_nbhd_is_nonempty X, U ) ) ↦  all_local_compositions X x₀ p.1 p.2 
 
 -- lifts_of_slsc_pc_nbhds creates a collection of subsets of the universal cover which correspond
 -- to each homotopy equivalence class of paths
-def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X) ( U : slsc_pc_nbhds X) ( γ : Path x₀ ( get_point U ) ) : Set ( Set ( UniversalCover X x₀ )) :=
-  all_local_compositions X x₀ ''
+def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X) 
+ -- ( U : slsc_pc_nbhds X) ( γ : Path x₀ ( get_point U ) ) 
+ : Set (Set (UniversalCover X x₀)) :=
+  range (fun p : Σ (U : slsc_pc_nbhds X), Path x₀ (get_point U, (slsc_nbhd_is_nonempty X, U ) ) ↦  all_local_compositions X x₀ p.1 p.2)
 
-
+instance (X : Type _) [TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space X] (x₀ : X) : TopologicalSpace (UniversalCover X x₀) :=  
+  generateFrom (lifts_of_slsc_pc_nbhds X x₀)
 
 lemma lifts_of_slsc_pc_nbhds_is_basis {X: Type _} [TopologicalSpace X] [lpc: LocPathConnectedSpace X] [slsc: slsc_space X] (x₀ : X) (Y : UniversalCover X x₀) :
-  IsTopologicalBasis ( lifts_of_slsc_pc_nbhds X x₀ ) := by 
-  apply isTopologicalBasis_of_open_of_nhds
+  IsTopologicalBasis (lifts_of_slsc_pc_nbhds X x₀) := by sorry 
+  -- apply isTopologicalBasis_of_open_of_nhds
 --     sorry
 --   sorry  
-
-instance (X : Type _)[TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space X] (x₀: X) : 
-  TopologicalSpace (UniversalCover X x₀) where
-  generateFrom(lifts_of_slsc_pc_nbhds X)
-  sorry
 
