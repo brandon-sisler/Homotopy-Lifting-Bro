@@ -202,45 +202,84 @@ clopen in U_y (where for y ∈ Y, F(y) ∈ X has evenly covered nbhd V_y by defn
 of covering and U_y := F^{-1}(V_y)) -/
 
   have fCont: Continuous f:= IsCoveringMap.continuous hf 
-
   have H₁Cont: Continuous H₁:= ContinuousMap.continuous H₁ 
+  have H₂Cont: Continuous H₂:= ContinuousMap.continuous H₂
+
 
   have ClopenS : IsClopen S := by
     apply is_clopen_of_is_clopen_coe
     intro y
-    specialize hf (f (H₁ y))
-    have t:= (hf ).toTrivialization
-    rcases hf with ⟨DT,TrivN,xTrivN ⟩   --- x=f(H₁ y)
+    let x:=(f (H₁ y))
+    specialize hf (x)
+    --have t:= (hf ).toTrivialization
+    rcases hf with ⟨DT, TrivN, xTrivN ⟩   --- x=f(H₁ y)
     let U_y := ((f∘ H₁)⁻¹' TrivN.baseSet)
-    use  U_y 
-    have : U_y∈ 𝓝 y:= by
+    use  U_y  
+    have UyNy: U_y∈ 𝓝 y:= by
       rw [IsOpen.mem_nhds_iff]
-      exact xTrivN
+      · exact xTrivN
       apply  Continuous.isOpen_preimage 
-      exact Continuous.comp fCont H₁Cont
-      exact TrivN.open_baseSet
-    use this
+      · exact Continuous.comp fCont H₁Cont
+      · exact TrivN.open_baseSet
+    use UyNy
     dsimp only [Set.preimage_setOf_eq]
     --show IsClopen {w : (f∘ H₁)⁻¹' TrivN.baseSet | H₁ w = H₂ w}
     --have localTrivN:=(TrivN.preimageHomeomorph (Eq.subset rfl))
     --have localTrivNto := localTrivN.toFun dhduh
-    have key: ∀ u:U_y, H₁ u=H₂ u ↔ (TrivN (H₁ u)).2=(TrivN (H₂ u)).2:= by
+    have key : ∀ u : U_y, H₁ u = H₂ u ↔ (TrivN (H₁ u)).2 = (TrivN (H₂ u)).2 := by
       intro u
+
+      
+      have FuBaseSet : (f ∘ H₂) u ∈ TrivN.baseSet := by
+        have hFu : ∀ u' ∈ U_y , (f ∘ H₂) u' ∈ TrivN.baseSet := by 
+          intro u'
+          intro Q
+          show u' ∈ (f ∘ H₂)⁻¹' (TrivN.baseSet)  
+          rw [← h]
+          exact Q
+        specialize hFu u
+        apply hFu
+        exact Subtype.mem u
+
+      
+
+
+      
       constructor
-      intro G1
-      exact congrArg Prod.snd (congrArg (↑TrivN) G1)
+      intro H₁ueqH₂u
+      · exact congrArg Prod.snd (congrArg (↑TrivN) H₁ueqH₂u)
       --exact congrArg Prod.snd (congrArg (↑t) G1)
-      intro G2
-      have G31 : f (H₁ u)=(f∘  H₁) u:= by exact rfl
-      have G32 : f (H₂  u)=(f∘  H₂ ) u:= by exact rfl
-      have G4 : f (H₁ u) = f (H₂ u) := by
-        rw [G31]
-        rw [G32]
-        rw [h]
+      
+      --have G31 : f (H₁ u)=(f∘  H₁) u:= by exact rfl
+      --have G32 : f (H₂  u)=(f∘  H₂ ) u:= by exact rfl
+      have FuEq : f (H₁ u) = f (H₂ u) := by
+        calc
+        f (H₁ u)=(f∘  H₁) u:=  rfl
+        _=(f∘ H₂) u:= by rw [h]
+        --rw [G31]
+        --rw [G32]
+        --rw [h]
+
+
+      have H₁uSource: H₁ u ∈ TrivN.source:= by
+        rw [TrivN.mem_source]
+        rw [FuEq]
+        exact FuBaseSet
+
+      have H₂uSource: H₂ u ∈ TrivN.source:= by
+        rw [TrivN.mem_source]
+
+        exact FuBaseSet
+
+      intro H₁ProjeqH₂Proj
       apply TrivN.injOn 
-      rw [TrivN.mem_source]
-      have :f (H₁ u) ∈ TrivN.baseSet ↔ H₁ u ∈ f⁻¹' TrivN.baseSet:= by exact Set.mem_def 
-      rw [this]
+      
+      exact H₁uSource
+      exact H₂uSource
+      
+      
+      /-have :f (H₁ u) ∈ TrivN.baseSet ↔ H₁ u ∈ f⁻¹' TrivN.baseSet:= by exact Set.mem_def 
+      --rw [this]
       have W : ∀ u ∈ U_y , (f ∘ H₁) u ∈ TrivN.baseSet := by 
         intro u
         intro Q
@@ -248,79 +287,105 @@ of covering and U_y := F^{-1}(V_y)) -/
         exact Q
       have some :H₁ u ∈ f⁻¹' TrivN.baseSet := by
         show f (H₁ u) ∈ TrivN.baseSet
-        rw [G31]
+        --rw [G31]
         have that : (f ∘ H₁) u ∈ TrivN.baseSet := by
           specialize W u
           apply W
           exact Subtype.mem u
         exact that
 
-      exact some
+      
 
-      rw [TrivN.mem_source]
+      
+      
+      --exact some
+
+
+
+
+
+
+      --rw [TrivN.mem_source]
       have :f (H₂ u) ∈ TrivN.baseSet ↔ H₂ u ∈ f⁻¹' TrivN.baseSet:= by exact Set.mem_def 
-      rw [this]
-      have W : ∀ u ∈ U_y , (f ∘ H₂) u ∈ TrivN.baseSet := by 
+      --rw [this]
+      /-have W : ∀ u ∈ U_y , (f ∘ H₂) u ∈ TrivN.baseSet := by 
         intro u
         intro Q
         show u ∈ (f ∘ H₂)⁻¹' (TrivN.baseSet)  
-        sorry
-        --exact Q
+        rw [← h]
+        exact Q
+      
+
+      have that1 : (f ∘ H₂) u ∈ TrivN.baseSet := by
+          specialize W u
+          apply W
+          exact Subtype.mem u-/
+        
+
+
       have some :H₂ u ∈ f⁻¹' TrivN.baseSet := by
         show f (H₂ u) ∈ TrivN.baseSet
         --rw [G31]
-        have that : (f ∘ H₂) u ∈ TrivN.baseSet := by
-          specialize W u
-          apply W
-          exact Subtype.mem u
-        exact that
+        exact FuBaseSet
       
-      exact some
+      --exact some   -/
       
 
 
-      have th11:= TrivN.proj_toFun (H₂ u)
+      --have th12: H₂ u ∈ TrivN.source ↔ (f ∘H₂ ) u ∈ TrivN.baseSet := by exact
+      --  TrivN.mem_source  
+      
+      --have th13: H₂ u ∈ TrivN.source:= by 
+        --rw [TrivN.mem_source]
+        ----rw [th12]
+        --exact FuBaseSet
+
+      --have th11:= TrivN.proj_toFun (H₂ u) H₂uSource  --need to use this for following
+      --have th12:= TrivN.proj_toFun (H₁ u) H₁uSource  --need to use this for following
+      
       ext
-      have H1 : (TrivN.toLocalHomeomorph (H₁ u)).fst= f (H₁ u):= by 
-        apply Iff.mpr Prod.fst_eq_iff
-        ext
-        simp
-        sorry
-        simp 
+      /-have H1 : (TrivN.toLocalHomeomorph (H₁ u)).fst= f (H₁ u):= by 
+        --apply Iff.mpr Prod.fst_eq_iff
+        --simp
+        --simp at th12
+        exact th12
+        
+         
       have H2 : (TrivN.toLocalHomeomorph (H₂ u)).fst= f (H₂ u):= by 
         apply Iff.mpr Prod.fst_eq_iff
         ext
         simp
-        sorry
-        simp 
-      rw [H1]
-      rw [H2]
-      exact G4
-      exact congrArg Subtype.val G2
+        simp at th11
+        rw [th11]
+        simp-/
+
+      rw [TrivN.proj_toFun (H₁ u) H₁uSource]
+      rw [TrivN.proj_toFun (H₂ u) H₂uSource]
+      
+      exact FuEq
+      exact congrArg Subtype.val H₁ProjeqH₂Proj
     simp_rw [key]
     apply clopen_equalizer_of_discrete
     apply Continuous.snd 
-    sorry       
+    apply Continuous.comp
+    sorry      
+    sorry
     apply Continuous.snd
-
-    
-
-      
     sorry
 
 --IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
 
-  have Hyp : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S := by
-    exact hC
-  have SisUniv : S = Set.univ := by 
+  --have Hyp : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S := by
+    --exact hC
+  have SEqUniv : S = Set.univ := by 
     apply clopen_set_intersect_connected_components_whole_set 
     exact ClopenS 
-    exact Hyp 
+    exact hC 
   ext z
-  have K : z ∈ S := by  
-    rw [SisUniv]
+  have zS : z ∈ S := by  
+    rw [SEqUniv]
     exact trivial 
-  exact K 
+  exact zS 
    
 
 
