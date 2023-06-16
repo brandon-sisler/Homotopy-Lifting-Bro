@@ -81,9 +81,26 @@ theorem test2 (y : Y) :
   constructor
   . exact hU
   . let Ft' : ContinuousMap ((univ : Set I) ×ˢ U) Xt := by
-      -- let Ft' : (univ : Set I) ×ˢ U → Xt := uncurry Ft
-      sorry
-    sorry
+      let Ft' : (univ : Set I) ×ˢ U → Xt := restrict ((univ : Set I) ×ˢ U) (uncurry Ft)
+      have hFt' : Continuous Ft' := by
+        rw [continuousOn_iff_continuous_restrict] at hFt
+        exact hFt
+      exact ⟨Ft', hFt'⟩
+    use Ft'
+    constructor
+    . rintro y' hy'
+      rw [← restrict_eq_restrict_iff] at eq1
+      rw [restrict_eq_iff] at eq1
+      specialize eq1 y' hy'
+      dsimp
+      rw [eq1]
+      rfl
+    . intro z
+      rw [← restrict_eq_restrict_iff] at eq2
+      rw [restrict_eq_iff] at eq2
+      specialize eq2 z (Subtype.mem z)
+      rw [eq2]
+      rfl
 
 def tube (y : Y) : Set Y := (hp.test2 Φ y).choose
 
@@ -104,7 +121,12 @@ noncomputable def liftToCoveringSpace : ContinuousMap (I × Y) Xt :=
 ContinuousMap.liftCover
   (fun y ↦ ((univ : Set I) ×ˢ hp.tube Φ y))
   (hp.nhd_lift Φ)
-  sorry
+  ( by
+    rintro y₁ y₂ x hxi hxj
+    let U := (univ : Set I) ×ˢ hp.tube Φ y₁ ∩ (univ : Set I) ×ˢ hp.tube Φ y₂
+    sorry
+    -- apply uniqueness_of_homotopy_lifting _ _ hp (hp.nhd_lift Φ y₁) (hp.nhd_lift Φ y₂) 
+  )
   sorry
 
 theorem homotopy_lift₁ : p ∘ (hp.liftToCoveringSpace Φ) = Φ.F := by
