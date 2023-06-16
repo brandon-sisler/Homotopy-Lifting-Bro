@@ -22,7 +22,12 @@ def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop :=
   ∃ (hx : x ∈ U), ∀ p : Path (X := U) ⟨x, hx⟩ ⟨x, hx⟩, Path.Homotopic (inc_path _ _ _ p) (Path.refl _) 
 
 lemma subset_slsc_is_slsc {X: Type _} [TopologicalSpace X] (x:X){U V: Set X} (slscU: slsc_subspace x U) (VU: V ⊆ U)(xinV: x ∈ V):
-  slsc_subspace x V := by sorry 
+  slsc_subspace x V := by 
+    use xinV
+    intro loopV 
+    rcases slscU with ⟨ xinU, loopU ⟩ 
+    have loopV_to_loopU : Path (X := U) ⟨x, xinU⟩ ⟨x, xinU⟩  :=sorry
+    sorry 
 
 def slsc_pc_subspace {X: Type _} [TopologicalSpace X] (U: Set X) : Prop :=
   ∃ x, slsc_subspace x U ∧ IsPathConnected U ∧ U.Nonempty
@@ -87,7 +92,7 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     have slscUW : slsc_subspace a (U ∩ W):= by exact subset_slsc_is_slsc a slscW (inter_sub_right U W) ainUW
     rcases (path_connected_open_basis a).mem_iff.mp UW_in with ⟨ V, ⟨ V_in, openV , pcV⟩ , hVUW : V ⊆ U ∩ W⟩  
     rcases mem_nhds_iff.mp V_in with ⟨S, ⟨ hSV, openS, ainS ⟩ ⟩
-    have slscV : slsc_subspace a V:= by  sorry
+    have slscV : slsc_subspace a V:= by exact subset_slsc_is_slsc a slscUW hVUW (hSV ainS)
     use V
     constructor 
     . constructor
