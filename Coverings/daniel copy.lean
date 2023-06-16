@@ -121,7 +121,12 @@ noncomputable def liftToCoveringSpace : ContinuousMap (I × Y) Xt :=
 ContinuousMap.liftCover
   (fun y ↦ ((univ : Set I) ×ˢ hp.tube Φ y))
   (hp.nhd_lift Φ)
-  sorry
+  ( by
+    rintro y₁ y₂ x hxi hxj
+    let U := (univ : Set I) ×ˢ hp.tube Φ y₁ ∩ (univ : Set I) ×ˢ hp.tube Φ y₂
+    sorry
+    -- apply uniqueness_of_homotopy_lifting _ _ hp (hp.nhd_lift Φ y₁) (hp.nhd_lift Φ y₂) 
+  )
   sorry
 
 theorem homotopy_lift₁ : p ∘ (hp.liftToCoveringSpace Φ) = Φ.F := by
