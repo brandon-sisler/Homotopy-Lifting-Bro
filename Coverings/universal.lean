@@ -14,7 +14,7 @@ open ContinuousMap
 def inc_path {X: Type _} [TopologicalSpace X] 
          (U: Set X) (x y: U) (p : Path x y): Path (x:X) (y:X) where
       toFun t := p t
-      continuous_toFun := by continuity --p.continuous_toFun  
+      continuous_toFun := by continuity  
       source' := by simp
       target' := by simp
 
@@ -34,6 +34,40 @@ class slsc_space (X: Type _)[TopologicalSpace X] where
 def slsc_pc_nbhds (X: Type _)[TopologicalSpace X]: Set (Set X):= 
   { U : Set X | IsOpen U ∧ slsc_pc_subspace U } 
 
+
+open Topology Filter
+
+-- A locally path connected space is a locally connected space
+instance [TopologicalSpace X] [LocPathConnectedSpace X] : LocallyConnectedSpace X := by
+    apply locallyConnectedSpace_of_connected_bases
+    exact path_connected_basis
+    rintro x U ⟨-, hU⟩
+    exact hU.isConnected.2
+
+--Patrick's lemma that a locally path connected space has a path connected and open basis for the neighborhood filter
+lemma path_connected_open_basis [TopologicalSpace X] [LocPathConnectedSpace X] (x : X) :
+    (𝓝 x).HasBasis (fun s ↦ s ∈ 𝓝 x ∧ IsOpen s ∧ IsPathConnected s) id := by
+  constructor
+  intro U
+  rw [(path_connected_basis x).mem_iff]
+  constructor
+  · rintro ⟨V, ⟨V_in, -⟩, VU : V ⊆ U⟩
+    rcases (nhds_basis_opens x).mem_iff.mp V_in with ⟨W, ⟨xW, W_op⟩, WV⟩
+    refine ⟨connectedComponentIn W x, ⟨?_, ?_, ?_⟩, ?_⟩
+    · exact W_op.connectedComponentIn.mem_nhds (mem_connectedComponentIn xW)
+    · exact W_op.connectedComponentIn
+    · rw [W_op.connectedComponentIn.isConnected_iff_isPathConnected]
+      exact isConnected_connectedComponentIn_iff.mpr xW
+    · exact (connectedComponentIn_subset W x).trans (WV.trans VU)
+  · rintro ⟨V, ⟨V_in, -, hV⟩, hVU : V ⊆ U⟩
+    exact ⟨V, ⟨V_in, hV⟩, hVU⟩
+
+lemma inter_sub_left {X : Type _}(U W : Set X) : U ∩ W ⊆ U := by
+  simp
+
+lemma inter_sub_right {X : Type _}(U W : Set X) : U ∩ W ⊆ W := by
+  simp
+
 -- To show that the slsc and path connected collection is a basis when X is a locally path connected space
 lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnectedSpace X][slsc: slsc_space X]:
   IsTopologicalBasis (slsc_pc_nbhds X) :=by 
@@ -43,30 +77,32 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     exact Uslpc.1
 
   . intro a U ainU openU
-    rcases slsc_space.slsc_nbhd_exists a with ⟨ W , ⟨openW, ⟨ ainW , slsc_condition ⟩ ⟩ ⟩ 
-    
+    rcases slsc_space.slsc_nbhd_exists a with ⟨ W , ⟨openW, ⟨ ainW , slsc_conditionW ⟩ ⟩ ⟩ 
+    have slscW : slsc_subspace a W := by 
+      use ainW
+      exact slsc_conditionW
     have openUW : IsOpen (U ∩ W):= TopologicalSpace.isOpen_inter U W openU openW
-    -- have slscUW : slsc_subspace a (U ∩ W):= by sorry
     have ainUW : a ∈ U ∩ W := ⟨ ainU , ainW ⟩ 
     have UW_in : (U ∩ W) ∈ 𝓝 a := openUW.mem_nhds ainUW
-    have this:= (path_connected_basis a).mem_iff.mp UW_in 
-    rcases this with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U ∩ W⟩
-    have new:= mem_nhds_iff.mp V_in 
-    rcases new with ⟨S, ⟨ hSV, openS, ainS ⟩ ⟩
-    have slscS : slsc_subspace a S:= by sorry
-    use S
+    have slscUW : slsc_subspace a (U ∩ W):= by exact subset_slsc_is_slsc a slscW (inter_sub_right U W) ainUW
+    rcases (path_connected_open_basis a).mem_iff.mp UW_in with ⟨ V, ⟨ V_in, openV , pcV⟩ , hVUW : V ⊆ U ∩ W⟩  
+    rcases mem_nhds_iff.mp V_in with ⟨S, ⟨ hSV, openS, ainS ⟩ ⟩
+    have slscV : slsc_subspace a V:= by  sorry
+    use V
     constructor 
     . constructor
-      exact openS
+      exact openV
       use a
-      
-
+      constructor
+      . exact slscV
+      . constructor
+        . exact pcV
+        . sorry
 
     . constructor
-      exact ainS
-      intro x xs
-      exact (hVU (hSV xs)).1
-      
+      . exact hSV ainS
+      . exact subset_trans hVUW (inter_sub_left U W) 
+
       -- have : S ⊆ U := by  
       -- exact ⟨ ainS, ⟩ 
     --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
