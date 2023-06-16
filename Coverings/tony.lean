@@ -12,7 +12,6 @@ import Mathlib.Data.Set.Lattice
 
 --set_option autoImplicit false
 
---CompactIccSpace
 open Function
 open unitInterval 
 open Topology
@@ -21,9 +20,10 @@ open Set
 --instance : Nontrivial I := ⟨0, 1, sorry⟩
 instance : NoMaxOrder ↑I := by sorry
 instance : NoMinOrder ↑I := by sorry
+-- need to change I to ℝ notation for most places
 
-
- -- SECTION 1: Use Covering map + Product Topology to Define the open boxes for each point in Y × I
+ -- SECTION 1: 
+ -- Use Covering map + Product Topology to Define the open boxes for each point in Y × I
 structure ConstructionData  [TopologicalSpace Y] [TopologicalSpace X] [TopologicalSpace Xt] (p: Xt → X)
     (F: I → Y → X) where
   U : Y → I → Set Y
@@ -105,7 +105,8 @@ def mkConstructionData
     sub_triv := fun y t ↦ (aux₁ hp CF y t).choose_spec.choose_spec.choose_spec.2.2
 
 
- -- SECTION 2 : Use Compactness to get a Finite Open Cover of the Tube
+ -- SECTION 2 : 
+ -- Use Compactness to get a Finite Open Cover of the Tube
 def ConstructionData.box {p: Xt → X}
     {F: I → Y → X} (data : ConstructionData p F) := 
     fun y t => Set.prod (data.U y t) (Set.Ioo (data.a y t) (data.b y t))
@@ -196,7 +197,8 @@ theorem test (Y X Xt : Type _)
   have N := ⋂ (i: I) (_ : i ∈ J), data.U yq i
   use N
 
-  -- SECTION 3: Define the function Ft inductively on the finite set derived in SECTION 02
+  -- SECTION 3: 
+  -- Define the function Ft inductively on the finite set derived in SECTION 02
   -- have q : ∀ y: Y, ∃ J: Finset I,  
   have Ft : I → Y → Xt := by
     intro t
