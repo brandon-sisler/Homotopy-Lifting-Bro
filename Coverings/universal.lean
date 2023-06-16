@@ -111,8 +111,15 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
 noncomputable
 def get_point {X: Type _} (U : Set  X) (h : U.Nonempty) : X := h.choose
 
-lemma slsc_nbhd_is_nonempty (X : Type _) [TopologicalSpace X] (U : slsc_pc_nbhds X) : U.1.Nonempty :=
+lemma slsc_nbhd_is_nonempty (X : Type _) [TopologicalSpace X] (U : slsc_pc_nbhds X) : U.1.Nonempty := by
+  have h_expand : ∃ x : X , slsc_subspace x U.1 ∧ IsPathConnected U.1 ∧ U.1.Nonempty by := sorry
+  
+  
+
+
   sorry
+
+  
 
 -- The universal cover is defined to be the quotient of the path space of X modulo the equivalence relation generated     
 def UniversalCover (X: Type _) [TopologicalSpace X] (x₀ : X) :=
