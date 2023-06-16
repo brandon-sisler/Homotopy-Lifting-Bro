@@ -56,6 +56,18 @@ example (X : Type _) (s : Set (Set X)) (h : ∀ U V : Set X, U ∈ s → V ⊆ U
 -- ∀ \gamma : Path x x , 
 open ContinuousMap
 
+--Locally Path connected without filters
+
+-- def lpc_subset_of_nbhd {X: Type _}[TopologicalSpace X][lpc: LocPathConnectedSpace X]
+--       (x:X){U: Set X}(xinU: x ∈ U)(openU: IsOpen U): Set X ∧ := by
+--         have U_in : U ∈ 𝓝 x := openU.mem_nhds xinU
+--         have this := (path_connected_basis x).mem_iff.mp U_in
+--         have V:= this.choose
+--         sorry
+--         --rcases this with ⟨V, ⟨V_in, hV⟩, hVU⟩
+
+
+
 -- Semi Simply connected: 
 def inc_path {X: Type _} [TopologicalSpace X] 
          (U: Set X) (x y: U) (p : Path x y): Path (x:X) (y:X) where
@@ -64,6 +76,7 @@ def inc_path {X: Type _} [TopologicalSpace X]
       source' := by simp
       target' := by simp
 
+
 --When is a  U :Set X with x ∈ U ⊂ X a semi local simply connected neighborhood?
 -- ⟨ x, h ⟩ 
 
@@ -71,7 +84,8 @@ def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop :=
   ∃ (hx : x ∈ U), ∀ p : Path (X := U) ⟨x, hx⟩ ⟨x, hx⟩, Path.Homotopic (inc_path _ _ _ p) (Path.refl _) 
 
 
--- Condition becomes  
+lemma subset_slsc_is_slsc {X: Type _} [TopologicalSpace X] (x:X){U V: Set X} (slscU: slsc_subspace x U) (VU: V ⊆ U)(xinV: x ∈ V):
+  slsc_subspace x V := by sorry 
 
 -- TODO:
 -- 1. Tell Lean U is a subspace of X
@@ -110,16 +124,29 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     rcases slsc_space.slsc_nbhd_exists a with ⟨ W , ⟨openW, ⟨ ainW , slsc_condition ⟩ ⟩ ⟩ 
     
     have openUW : IsOpen (U ∩ W):= TopologicalSpace.isOpen_inter U W openU openW
-    have slscUW : slsc_subspace a (U ∩ W):= by sorry
+    -- have slscUW : slsc_subspace a (U ∩ W):= by sorry
     have ainUW : a ∈ U ∩ W := ⟨ ainU , ainW ⟩ 
     have UW_in : (U ∩ W) ∈ 𝓝 a := openUW.mem_nhds ainUW
-    rcases(path_connected_basis a).mem_iff.mp UW_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U ∩ W⟩
-    have slscV : slsc_subspace a V:= by sorry
-    use V
+    have this:= (path_connected_basis a).mem_iff.mp UW_in 
+    rcases this with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U ∩ W⟩
+    have new:= mem_nhds_iff.mp V_in 
+    rcases new with ⟨S, ⟨ hSV, openS, ainS ⟩ ⟩
+    have slscS : slsc_subspace a S:= by sorry
+    use S
     constructor 
-    . sorry
+    . constructor
+      exact openS
+      use a
+      
 
-    . exact ⟨ V_in , hVU.1 ⟩ 
+
+    . constructor
+      exact ainS
+      intro x xs
+      exact (hVU (hSV xs)).1
+      
+      -- have : S ⊆ U := by  
+      -- exact ⟨ ainS, ⟩ 
     --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
     --rcases(path_connected_basis a).mem_iff.mp U_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U⟩
 
