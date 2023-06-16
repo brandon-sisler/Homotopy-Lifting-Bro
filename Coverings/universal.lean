@@ -163,6 +163,8 @@ def lifts_of_slsc_pc_nbhds (X : Type _) [TopologicalSpace X ] (x₀ : X)
 instance {X : Type _} [TopologicalSpace X] [LocPathConnectedSpace X] [slsc_space X] (x₀ : X) : TopologicalSpace (UniversalCover X x₀) :=  
   generateFrom (lifts_of_slsc_pc_nbhds X x₀)
 
+--Need to prove the U_γ are actually U_[γ] aka independence of homotopy class of γ
+
 --Lemma to prove propert (*) in hatcher
 lemma property_star {X: Type _} [TopologicalSpace X] [lpc: LocPathConnectedSpace X] 
   [slsc: slsc_space X] {x₀ : X} (Y : UniversalCover X x₀) (y: Y) (U : Set X) (h : U ∈ slsc_pc_nbhds X) 
