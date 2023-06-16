@@ -17,12 +17,37 @@ def inc_path {X: Type _} [TopologicalSpace X]
       continuous_toFun := by continuity  
       source' := by simp
       target' := by simp
+#check Subtype
+
+def inc_path_subset {X: Type _} [TopologicalSpace X] 
+         {U V: Set X}(x y:X) (h: x ∈ V) (g: y ∈ V) (VU: V ⊆ U) 
+          (p : Path (X := V) ⟨ x, h ⟩ ⟨ y , g ⟩ ): Path (X := U) ⟨ x, (VU h) ⟩ ⟨ y, (VU g) ⟩ where
+      toFun t := ⟨ (p t).1, VU (p t).2 ⟩ 
+      continuous_toFun := by continuity  
+      source' := by simp
+      target' := by simp
 
 def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop :=
   ∃ (hx : x ∈ U), ∀ p : Path (X := U) ⟨x, hx⟩ ⟨x, hx⟩, Path.Homotopic (inc_path _ _ _ p) (Path.refl _) 
 
+--Subset of a semi-locally-simply-connected subset is semi locally simply connected
 lemma subset_slsc_is_slsc {X: Type _} [TopologicalSpace X] (x:X){U V: Set X} (slscU: slsc_subspace x U) (VU: V ⊆ U)(xinV: x ∈ V):
-  slsc_subspace x V := by sorry 
+  slsc_subspace x V := by 
+    use xinV
+    intro loopV 
+    rcases slscU with ⟨ xinU, loopU_hom_const ⟩ 
+    let loopV_to_U := inc_path_subset x x xinV xinV VU loopV
+    let loopV_to_X := inc_path _ _ _  loopV
+    let loopV_to_U_to_X := inc_path _ _ _  loopV_to_U
+    have this1: loopV_to_X = loopV_to_U_to_X := by 
+      ext t 
+      simp [inc_path, inc_path_subset]
+    specialize loopU_hom_const loopV_to_U
+    have same_is_hom: Path.Homotopic loopV_to_X loopV_to_U_to_X := by
+      rw [this1]
+    have loopV_to_X_hom_const :  Path.Homotopic loopV_to_X (Path.refl _) := by
+      exact Path.Homotopic.trans same_is_hom loopU_hom_const
+    exact loopV_to_X_hom_const 
 
 def slsc_pc_subspace {X: Type _} [TopologicalSpace X] (U: Set X) : Prop :=
   ∃ x, slsc_subspace x U ∧ IsPathConnected U ∧ U.Nonempty
@@ -87,7 +112,7 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     have slscUW : slsc_subspace a (U ∩ W):= by exact subset_slsc_is_slsc a slscW (inter_sub_right U W) ainUW
     rcases (path_connected_open_basis a).mem_iff.mp UW_in with ⟨ V, ⟨ V_in, openV , pcV⟩ , hVUW : V ⊆ U ∩ W⟩  
     rcases mem_nhds_iff.mp V_in with ⟨S, ⟨ hSV, openS, ainS ⟩ ⟩
-    have slscV : slsc_subspace a V:= by  sorry
+    have slscV : slsc_subspace a V:= by exact subset_slsc_is_slsc a slscUW hVUW (hSV ainS)
     use V
     constructor 
     . constructor
@@ -102,11 +127,6 @@ lemma slsc_pc_nbhds_is_basis {X: Type _}[TopologicalSpace X][lpc: LocPathConnect
     . constructor
       . exact hSV ainS
       . exact subset_trans hVUW (inter_sub_left U W) 
-
-      -- have : S ⊆ U := by  
-      -- exact ⟨ ainS, ⟩ 
-    --have U_in : U ∈ 𝓝 a := openU.mem_nhds ainU 
-    --rcases(path_connected_basis a).mem_iff.mp U_in with ⟨V, ⟨V_in, hV⟩, hVU : V ⊆ U⟩
 
 noncomputable
 def get_point {X: Type _} (U : Set  X) (h : U.Nonempty) : X := h.choose
