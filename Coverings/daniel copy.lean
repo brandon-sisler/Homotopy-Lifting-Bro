@@ -1,10 +1,10 @@
-import Mathlib.Topology.Basic
-import Mathlib.Topology.ContinuousOn
-import Mathlib.Topology.Covering
-import Mathlib.Topology.LocalHomeomorph
-import Mathlib.Topology.UnitInterval
+--import Mathlib.Topology.Basic
+--import Mathlib.Topology.ContinuousOn
+--import Mathlib.Topology.Covering
+--import Mathlib.Topology.LocalHomeomorph
+--import Mathlib.Topology.UnitInterval
 import Coverings.tony
-import Coverings.lean3
+--import Coverings.lean3
 import Coverings.Uniqueness
 open Topology Filter unitInterval Bundle
 
