@@ -366,8 +366,17 @@ of covering and U_y := F^{-1}(V_y)) -/
     apply Continuous.snd 
     apply Continuous.comp
     sorry      
-    sorry
+    --apply continuous_subtype_coe 
+    rw [continuous_def]
+    intro B hB
+    use H₁⁻¹' B
+    constructor
     
+    --constructor 
+    --constructor
+    sorry
+    simp
+    sorry
     apply Continuous.snd
     apply Continuous.comp
     sorry
