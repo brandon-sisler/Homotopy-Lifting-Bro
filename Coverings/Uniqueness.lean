@@ -205,7 +205,7 @@ theorem clopen_equalizer_of_discrete (Y:Type _) [TopologicalSpace Y]
          ^  \                ^ 
          |   \               |
          |       \ H₂        |
-         |        \          |  f ;   if the triangles commute then H₁=H₂.  
+         |        \          | covering f ;   if the triangles commute then H₁=H₂.  
          |      H₁     \     |
          |              \    |
          |                >  |
@@ -266,10 +266,15 @@ theorem uniqueness_of_homotopy_lifting (Y : Type _) [TopologicalSpace Y] (hf : I
         _=(f∘ H₂) u:= by rw [h]
 
     use  U_y  
-    
-    
     use UyNy
     dsimp only [Set.preimage_setOf_eq]
+
+    /-
+        Goal: {z ∈ U_y ∣ H₁(z) = H₂(z)} is clopen
+        key observation : 
+              {z ∈ U_y ∣ (proj_D ∘ H₁)(z) = (proj_D ∘ H₂)(z)} = {z ∈ U_y ∣ H₁(z) = H₂(z)}
+    -/
+    
     
     have key : ∀ u : U_y, H₁ u = H₂ u ↔ (TrivN (H₁ u)).2 = (TrivN (H₂ u)).2 := by
       intro u
