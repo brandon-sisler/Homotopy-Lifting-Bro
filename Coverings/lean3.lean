@@ -387,7 +387,7 @@ of covering and U_y := F^{-1}(V_y)) -/
 
     apply Continuous.snd
     
-    have h1: ∀ u : U_y, f (H₁ y)∈ TrivN.baseSet:= by exact fun u => xTrivN
+    --have h1: ∀ u : U_y, f (H₁ y)∈ TrivN.baseSet:= by exact fun u => xTrivN
     have h22: ∀ u : U_y, H₂ ((Subtype.val : U_y → Y) u) ∈ TrivN.source:= by 
       simp
       intro var
