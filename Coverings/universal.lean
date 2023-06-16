@@ -18,6 +18,14 @@ def inc_path {X: Type _} [TopologicalSpace X]
       source' := by simp
       target' := by simp
 
+def inc_path_subset {X: Type _} [TopologicalSpace X] 
+         {U V: Set X}(x y:X) (h: x ∈ V) (g: y ∈ V) (VU: V ⊆ U) 
+          (p : Path (X := V) ⟨ x, h ⟩ ⟨ y , g ⟩ ): Path (X := U) ⟨ x, (VU h) ⟩ ⟨ y, (VU g) ⟩ where
+      toFun t := p t
+      continuous_toFun := by continuity  
+      source' := by simp
+      target' := by simp
+
 def slsc_subspace {X: Type _} [TopologicalSpace X](x:X)(U: Set X) : Prop :=
   ∃ (hx : x ∈ U), ∀ p : Path (X := U) ⟨x, hx⟩ ⟨x, hx⟩, Path.Homotopic (inc_path _ _ _ p) (Path.refl _) 
 
@@ -25,8 +33,12 @@ lemma subset_slsc_is_slsc {X: Type _} [TopologicalSpace X] (x:X){U V: Set X} (sl
   slsc_subspace x V := by 
     use xinV
     intro loopV 
-    rcases slscU with ⟨ xinU, loopU ⟩ 
-    have loopV_to_loopU : Path (X := U) ⟨x, xinU⟩ ⟨x, xinU⟩  :=sorry
+    rcases slscU with ⟨ xinU, loopU_hom_const ⟩ 
+    let loopV_to_U := inc_path_subset x x xinV xinV VU loopV
+    let loopV_to_X := inc_path _ _ _  loopV
+    let loopV_to_U_to_X := inc_path _ _ _  loopV_to_U
+    --have loopV_to_X = loopV_to_U_to_X := by sorry
+    specialize loopU_hom_const loopV_to_U
     sorry 
 
 def slsc_pc_subspace {X: Type _} [TopologicalSpace X] (U: Set X) : Prop :=
