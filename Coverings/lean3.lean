@@ -374,11 +374,19 @@ of covering and U_y := F^{-1}(V_y)) -/
     apply clopen_equalizer_of_discrete
     apply Continuous.snd 
     apply Continuous.comp
-    sorry      
+    sorry     
+    --apply continuous_subtype_coe 
+    rw [continuous_def]
+    intro B hB
+    use H₁⁻¹' B
+    constructor
+    exact IsOpen.preimage H₁Cont hB
+    ext b
+    rfl
+    --simp
+    --simp at hb
     sorry
-    apply Continuous.snd
-    sorry
-
+    
 --IsOpen.mem_nhds_iff {a : α} {s : Set α} (hs : IsOpen s) : s ∈ 𝓝 a ↔ a ∈ s 
 
   --have Hyp : ∀ x : Y, ∃ y ∈ connectedComponent x, y ∈ S := by
